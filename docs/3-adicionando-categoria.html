@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treinamento Interativo: Adicionando Nova Tabela</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { background-color: #0f1214; color: #a3aab1; font-family: "Inter", sans-serif; }
+    .card { background-color: #171d21; border-radius: .75rem; border: 1px solid #1f2937; }
+    .step-active { color: #a855f7; border-color: #a855f7; }
+    .step-inactive { color: #4b5563; border-color: #374151; }
+    .step-clickable { cursor: pointer; }
+    .page-content { display: none; animation: fadeIn .32s ease; }
+    .page-active { display: block; }
+    .code { background: #0f172a; color: #e2e8f0; border: 1px solid #374151; border-radius: .5rem; padding: .875rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: .85rem; line-height: 1.45; white-space: pre; overflow-x: auto; }
+    .info-tag { display: inline-block; font-size: .75rem; font-weight: 700; color: #cbd5e1; background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: .25rem .55rem; margin-bottom: .55rem; }
+    .file-block { border: 1px solid #374151; border-radius: .75rem; background: rgba(15,23,42,.42); overflow: hidden; }
+    .file-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .7rem .8rem; background: rgba(17,24,39,.88); border-bottom: 1px solid #374151; }
+    .file-toggle { display: flex; align-items: center; gap: .55rem; color: #e5e7eb; background: transparent; border: none; font-size: .88rem; font-weight: 700; cursor: pointer; }
+    .file-toggle i { transition: transform .2s ease; color: #a78bfa; }
+    .file-toggle[aria-expanded="true"] i { transform: rotate(90deg); }
+    .actions { display: flex; align-items: center; gap: .4rem; }
+    .mini-btn { border: 1px solid #4b5563; background: #111827; color: #e5e7eb; border-radius: .5rem; font-size: .75rem; font-weight: 600; padding: .35rem .6rem; cursor: pointer; transition: .2s ease; }
+    .mini-btn:hover { background: #1f2937; border-color: #6b7280; }
+    .mini-btn.copied { background: #065f46; border-color: #10b981; color: #d1fae5; }
+    .file-content { display: none; padding: .8rem; }
+    .file-content.open { display: block; }
+    .callout { background: rgba(30,58,138,.22); border: 1px solid #1d4ed8; border-radius: .7rem; padding: .9rem; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(2,6,23,.75); display: none; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+    .modal-backdrop.show { display: flex; }
+    .finish-modal { width: 100%; max-width: 32rem; border-radius: 1rem; border: 1px solid #334155; background: radial-gradient(circle at top right,#1e293b 0%,#111827 55%,#0b1220 100%); color: #cbd5e1; }
+    .modal-head { padding: 1rem 1.25rem; border-bottom: 1px solid #334155; }
+    .modal-body { padding: 1.1rem 1.25rem 1.3rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1rem; }
+    .modal-btn { border-radius: .6rem; padding: .5rem .85rem; font-size: .85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+    .modal-btn.secondary { background: #1f2937; color: #d1d5db; border-color: #374151; }
+    .modal-btn.primary { background: #10b981; color: #052e26; border-color: #34d399; }
+    .code-modal { width: 100%; max-width: 75rem; max-height: 88vh; border-radius: 1rem; border: 1px solid #334155; background: #0b1220; overflow: hidden; display: flex; flex-direction: column; }
+    .code-modal-head { display: flex; align-items: center; justify-content: space-between; padding: .8rem 1rem; border-bottom: 1px solid #334155; background: #111827; }
+    .code-modal-body { padding: .9rem; overflow: auto; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div class="w-full max-w-4xl card shadow-2xl overflow-hidden">
+    <div class="p-6 border-b border-gray-800 bg-[#11161a]">
+      <h1 class="text-2xl font-bold text-white mb-6"><i class="fas fa-table text-purple-500 mr-2"></i>Trilha: Adicionando Nova Tabela</h1>
+      <div class="flex items-center justify-between relative">
+        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-800 -z-10"></div>
+        <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2" data-step="1" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div><span class="text-xs hidden sm:block">Contexto</span></div>
+        <div id="step-2" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="2" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">2</div><span class="text-xs hidden sm:block">Schema</span></div>
+        <div id="step-3" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="3" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">3</div><span class="text-xs hidden sm:block">Comandos</span></div>
+        <div id="step-4" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="4" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">4</div><span class="text-xs hidden sm:block">Validacao</span></div>
+        <div id="step-5" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="5" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">5</div><span class="text-xs hidden sm:block">Proximo</span></div>
+      </div>
+      <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
+        <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300" disabled><i class="fas fa-arrow-left mr-2"></i>Anterior</button>
+        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Proximo <i class="fas fa-arrow-right ml-2"></i></button>
+      </div>
+    </div>
+
+    <div id="page-1" class="page-content page-active p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🎯 Modulo 1: Objetivo da mudança</h2>
+      <div class="callout mb-4">
+        <p class="text-sm"><strong class="text-white">Contexto:</strong> agora o projeto ganhou uma nova tabela chamada <code>Categoria</code>.</p>
+        <p class="text-sm mt-2"><strong class="text-white">Meta desta trilha:</strong> consolidar a criação da tabela no schema, aplicar no banco e validar que tudo foi gerado corretamente.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span class="info-tag">🆕 Nova tabela: Categoria</span>
+        <span class="info-tag">📦 Tabela existente: Produto</span>
+        <span class="info-tag">🧪 Foco: schema + migrate + generate</span>
+      </div>
+    </div>
+
+    <div id="page-2" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🗂️ Modulo 2: Schema completo atualizado</h2>
+      <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mb-4">
+        <p class="text-sm"><strong class="text-white">📘 Importante:</strong> abaixo está o schema completo atual com a nova tabela, no caminho completo do projeto.</p>
+      </div>
+      <div class="file-block">
+        <div class="file-head">
+          <button class="file-toggle" type="button" data-target="panel-schema" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>prisma\schema.prisma</span></button>
+          <div class="actions"><button class="mini-btn" data-copy-target="code-schema">Copiar</button><button class="mini-btn" data-expand-target="code-schema" data-expand-title="prisma\\schema.prisma">Expandir</button></div>
+        </div>
+        <div id="panel-schema" class="file-content"><pre id="code-schema" class="code">generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Categoria {
+  id           Int      @id @default(autoincrement())
+  nome         String   @unique
+  descricao    String
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+model Produto {
+  id           Int      @id @default(autoincrement())
+  nome         String   @unique
+  quantidade   Int
+  preco        Float
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}</pre></div>
+      </div>
+    </div>
+
+    <div id="page-3" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">⚙️ Modulo 3: Aplicar a nova tabela no banco</h2>
+      <div class="info-tag">1. Validar schema</div>
+      <div class="code">npx prisma validate</div>
+      <div class="info-tag mt-4">2. Formatar schema</div>
+      <div class="code">npx prisma format</div>
+      <div class="info-tag mt-4">3. Criar migration da tabela nova</div>
+      <div class="code">npx prisma migrate dev --name adiciona_tabela_categoria</div>
+      <div class="info-tag mt-4">4. Garantir client atualizado</div>
+      <div class="code">npx prisma generate</div>
+    </div>
+
+    <div id="page-4" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">✅ Modulo 4: Validacao tecnica</h2>
+      <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+        <h3 class="text-white font-semibold mb-3">Checklist rapido</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="info-tag">📁 Arquivo atualizado: prisma\schema.prisma</span>
+          <span class="info-tag">🧱 Migration gerada em prisma\migrations</span>
+          <span class="info-tag">🧠 Prisma Client regenerado</span>
+          <span class="info-tag">🔍 Tabela Categoria visivel no Studio</span>
+        </div>
+      </div>
+      <div class="info-tag mt-4">Abrir Prisma Studio</div>
+      <div class="code">npx prisma studio</div>
+    </div>
+
+    <div id="page-5" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🔗 Modulo 5: Proximo passo</h2>
+      <div class="callout">
+        <p class="text-sm"><strong class="text-white">Pronto para a proxima etapa:</strong> com a nova tabela criada e validada, o próximo conteúdo será a parte de <strong class="text-white">relacionamento</strong> entre <code>Produto</code> e <code>Categoria</code>.</p>
+        <p class="text-sm mt-2">Nessa próxima trilha vamos definir chaves, campos de referência e atualizar API/frontend para usar a relação.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
+    <div class="finish-modal">
+      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Etapa concluida</h3></div>
+      <div class="modal-body">
+        <p class="text-sm">A trilha de adicao da nova tabela foi concluida.</p>
+        <div class="modal-actions"><button id="finish-close" type="button" class="modal-btn secondary">Fechar</button><button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="code-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="code-title">
+    <div class="code-modal">
+      <div class="code-modal-head">
+        <h3 id="code-title" class="text-sm font-semibold text-white">Codigo</h3>
+        <div class="actions"><button id="code-copy" class="mini-btn" type="button">Copiar</button><button id="code-close" class="mini-btn" type="button">Fechar</button></div>
+      </div>
+      <div class="code-modal-body"><pre id="code-content" class="code"></pre></div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const totalPages = 5;
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    const finishModalBackdrop = document.getElementById("finish-modal-backdrop");
+    const codeModalBackdrop = document.getElementById("code-modal-backdrop");
+    const codeContent = document.getElementById("code-content");
+    const codeTitle = document.getElementById("code-title");
+    const codeCopy = document.getElementById("code-copy");
+
+    function copyTextWithFallback(text) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      return Promise.reject(new Error("Clipboard indisponivel"));
+    }
+
+    function bindCopyButton(button, targetElement) {
+      button.addEventListener("click", async () => {
+        try {
+          await copyTextWithFallback(targetElement.textContent || "");
+          const old = button.textContent;
+          button.classList.add("copied");
+          button.textContent = "Copiado!";
+          setTimeout(() => { button.classList.remove("copied"); button.textContent = old || "Copiar"; }, 1200);
+        } catch {
+          const old = button.textContent;
+          button.textContent = "Erro";
+          setTimeout(() => { button.textContent = old || "Copiar"; }, 1200);
+        }
+      });
+    }
+
+    document.querySelectorAll(".mini-btn[data-copy-target]").forEach((button) => {
+      const target = document.getElementById(button.getAttribute("data-copy-target"));
+      if (target) bindCopyButton(button, target);
+    });
+
+    document.querySelectorAll(".file-toggle[data-target]").forEach((toggle) => {
+      const panel = document.getElementById(toggle.getAttribute("data-target"));
+      if (!panel) return;
+      toggle.addEventListener("click", () => {
+        const isOpen = panel.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+    });
+
+    document.querySelectorAll(".mini-btn[data-expand-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.getAttribute("data-expand-target"));
+        if (!target) return;
+        codeTitle.textContent = button.getAttribute("data-expand-title") || "Codigo";
+        codeContent.textContent = target.textContent || "";
+        codeModalBackdrop.classList.add("show");
+      });
+    });
+
+    bindCopyButton(codeCopy, codeContent);
+    document.getElementById("code-close").addEventListener("click", () => codeModalBackdrop.classList.remove("show"));
+    codeModalBackdrop.addEventListener("click", (event) => { if (event.target === codeModalBackdrop) codeModalBackdrop.classList.remove("show"); });
+    document.getElementById("finish-close").addEventListener("click", () => finishModalBackdrop.classList.remove("show"));
+    document.getElementById("finish-restart").addEventListener("click", () => { finishModalBackdrop.classList.remove("show"); goToPage(1); });
+    finishModalBackdrop.addEventListener("click", (event) => { if (event.target === finishModalBackdrop) finishModalBackdrop.classList.remove("show"); });
+
+    function goToPage(targetPage) {
+      if (targetPage < 1 || targetPage > totalPages) return;
+      currentPage = targetPage;
+      updatePagination();
+    }
+
+    function updatePagination() {
+      for (let i = 1; i <= totalPages; i++) {
+        document.getElementById(`page-${i}`).classList.remove("page-active");
+        const step = document.getElementById(`step-${i}`);
+        const stepCircle = step.querySelector("div");
+        if (i <= currentPage) {
+          step.classList.add("step-active");
+          step.classList.remove("step-inactive");
+          stepCircle.classList.add("step-active");
+          stepCircle.classList.remove("step-inactive");
+        } else {
+          step.classList.remove("step-active");
+          step.classList.add("step-inactive");
+          stepCircle.classList.remove("step-active");
+          stepCircle.classList.add("step-inactive");
+        }
+      }
+      document.getElementById(`page-${currentPage}`).classList.add("page-active");
+      btnPrev.disabled = currentPage === 1;
+      if (currentPage === totalPages) {
+        btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
+        btnNext.classList.replace("bg-purple-600", "bg-green-600");
+      } else {
+        btnNext.innerHTML = 'Proximo <i class="fas fa-arrow-right ml-2"></i>';
+        btnNext.classList.replace("bg-green-600", "bg-purple-600");
+      }
+    }
+
+    btnNext.addEventListener("click", () => currentPage < totalPages ? goToPage(currentPage + 1) : finishModalBackdrop.classList.add("show"));
+    btnPrev.addEventListener("click", () => currentPage > 1 && goToPage(currentPage - 1));
+    document.querySelectorAll("[data-step]").forEach((step) => {
+      const targetPage = Number(step.getAttribute("data-step"));
+      step.addEventListener("click", () => goToPage(targetPage));
+      step.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          goToPage(targetPage);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

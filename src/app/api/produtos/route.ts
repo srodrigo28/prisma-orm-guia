@@ -5,10 +5,13 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const produtos = await prisma.produto.findMany({
+      include: {
+        categoria: true,
+      },
       orderBy: { criadoEm: "desc" },
     });
     return NextResponse.json(produtos);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Erro ao buscar produtos" }, { status: 500 });
   }
 }
@@ -17,7 +20,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { nome, quantidade, preco } = body;
+    const { nome, quantidade, preco, categoriaId } = body;
 
     // Validação de entrada
     if (!nome || quantidade === undefined || preco === undefined) {
@@ -47,13 +50,17 @@ export async function POST(request: Request) {
         nome,
         quantidade: Number(quantidade),
         preco: Number(preco),
+        categoriaId: categoriaId ? Number(categoriaId) : null,
+      },
+      include: {
+        categoria: true,
       },
     });
 
     return NextResponse.json(novoProduto, { status: 201 });
 
     
-  } catch (error) { // Chegou aqui dar um erro
+  } catch { // Chegou aqui dar um erro
     return NextResponse.json({ error: "Erro ao cadastrar produto" }, { status: 400 });
   }
 }

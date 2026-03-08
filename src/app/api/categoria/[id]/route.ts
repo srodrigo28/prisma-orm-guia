@@ -5,82 +5,82 @@ interface Context {
   params: Promise<{ id: string }>;
 }
 
-// 1. GET: Buscar produto por ID
+// 1. GET: Buscar categoria por ID
 export async function GET(request: NextRequest, { params }: Context) {
   try {
-    const { id: idParam } = await params; // Unwrapping aqui
+    const { id: idParam } = await params;
     const id = parseInt(idParam);
 
     if (isNaN(id) || id <= 0) {
       return NextResponse.json({ error: "ID inválido" }, { status: 400 });
     }
 
-    const produto = await prisma.produto.findUnique({
+    const categoria = await prisma.categoria.findUnique({
       where: { id },
-      include: {
-        categoria: true,
-      },
     });
 
-    if (!produto) {
-      return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
+    if (!categoria) {
+      return NextResponse.json({ error: "Categoria não encontrada" }, { status: 404 });
     }
 
-    return NextResponse.json(produto);
+    return NextResponse.json(categoria);
   } catch {
     return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }
 
-// 2. PUT: Atualizar produto por ID
+// 2. PUT: Atualizar categoria por ID
 export async function PUT(request: NextRequest, { params }: Context) {
   try {
-    const { id: idParam } = await params; // Unwrapping aqui
+    const { id: idParam } = await params;
     const id = parseInt(idParam);
-    
+
     if (isNaN(id)) {
       return NextResponse.json({ error: "ID inválido" }, { status: 400 });
     }
 
     const body = await request.json();
+    const { nome, descricao } = body;
 
-    const produtoAtualizado = await prisma.produto.update({
+    if (!nome || !descricao) {
+      return NextResponse.json(
+        { error: "Campos obrigatórios: nome e descricao." },
+        { status: 400 }
+      );
+    }
+
+    const categoriaAtualizada = await prisma.categoria.update({
       where: { id },
       data: {
-        nome: body.nome,
-        quantidade: Number(body.quantidade),
-        preco: Number(body.preco),
-        categoriaId: body.categoriaId ? Number(body.categoriaId) : null,
-      },
-      include: {
-        categoria: true,
+        nome,
+        descricao,
       },
     });
 
-    return NextResponse.json(produtoAtualizado);
+    return NextResponse.json(categoriaAtualizada);
   } catch (error: unknown) {
-    console.error("Erro no PUT:", error);
-    return NextResponse.json({ error: "Erro ao atualizar produto" }, { status: 400 });
+    console.error("Erro no PUT categoria:", error);
+    return NextResponse.json({ error: "Erro ao atualizar categoria" }, { status: 400 });
   }
 }
 
-// 3. DELETE: Excluir produto por ID
+// 3. DELETE: Excluir categoria por ID
 export async function DELETE(request: NextRequest, { params }: Context) {
   try {
-    const { id: idParam } = await params; // Unwrapping aqui
+    const { id: idParam } = await params;
     const id = parseInt(idParam);
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "ID inválido" }, { status: 400 });
     }
 
-    await prisma.produto.delete({
+    await prisma.categoria.delete({
       where: { id },
     });
 
     return new NextResponse(null, { status: 204 });
   } catch (error: unknown) {
-    console.error("Erro no DELETE:", error);
-    return NextResponse.json({ error: "Erro ao excluir" }, { status: 400 });
+    console.error("Erro no DELETE categoria:", error);
+    return NextResponse.json({ error: "Erro ao excluir categoria" }, { status: 400 });
   }
 }

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treinamento Interativo: Guia de Comandos Prisma</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { background-color: #0f1214; color: #a3aab1; font-family: "Inter", sans-serif; }
+    .card { background-color: #171d21; border-radius: .75rem; border: 1px solid #1f2937; }
+    .step-active { color: #a855f7; border-color: #a855f7; }
+    .step-inactive { color: #4b5563; border-color: #374151; }
+    .step-clickable { cursor: pointer; }
+    .page-content { display: none; animation: fadeIn .3s ease; }
+    .page-active { display: block; }
+    .code { background: #0f172a; color: #e2e8f0; border: 1px solid #374151; border-radius: .5rem; padding: .875rem; font-family: ui-monospace, monospace; font-size: .85rem; line-height: 1.45; white-space: pre; overflow-x: auto; }
+    .info-tag { display: inline-block; font-size: .75rem; font-weight: 700; color: #cbd5e1; background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: .25rem .55rem; margin-bottom: .55rem; }
+    .copy-inline { border: 1px solid #4b5563; background: #111827; color: #e5e7eb; border-radius: .5rem; font-size: .75rem; font-weight: 600; padding: .35rem .6rem; cursor: pointer; }
+    .copy-inline.copied { background: #065f46; border-color: #10b981; color: #d1fae5; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(2,6,23,.75); display: none; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+    .modal-backdrop.show { display: flex; }
+    .finish-modal { width: 100%; max-width: 32rem; border-radius: 1rem; border: 1px solid #334155; background: radial-gradient(circle at top right,#1e293b 0%,#111827 55%,#0b1220 100%); color: #cbd5e1; }
+    .modal-head { padding: 1rem 1.25rem; border-bottom: 1px solid #334155; }
+    .modal-body { padding: 1.1rem 1.25rem 1.3rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1rem; }
+    .modal-btn { border-radius: .6rem; padding: .5rem .85rem; font-size: .85rem; font-weight: 600; cursor: pointer; }
+    .modal-btn.secondary { background: #1f2937; color: #d1d5db; border: 1px solid #374151; }
+    .modal-btn.primary { background: #10b981; color: #052e26; border: 1px solid #34d399; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to {opacity:1; transform: translateY(0);} }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div class="w-full max-w-4xl card shadow-2xl overflow-hidden">
+    <div class="p-6 border-b border-gray-800 bg-[#11161a]">
+      <h1 class="text-2xl font-bold text-white mb-6"><i class="fas fa-terminal text-purple-500 mr-2"></i>Trilha: Comandos Prisma ORM</h1>
+      <div class="flex items-center justify-between relative">
+        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-800 -z-10"></div>
+        <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2" data-step="1"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div><span class="text-xs hidden sm:block">Fundacao</span></div>
+        <div id="step-2" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="2"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">2</div><span class="text-xs hidden sm:block">Schema</span></div>
+        <div id="step-3" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="3"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">3</div><span class="text-xs hidden sm:block">Sync</span></div>
+        <div id="step-4" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="4"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">4</div><span class="text-xs hidden sm:block">Teste</span></div>
+        <div id="step-5" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="5"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">5</div><span class="text-xs hidden sm:block">Rescue</span></div>
+        <div id="step-6" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="6"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">6</div><span class="text-xs hidden sm:block">Deploy</span></div>
+      </div>
+      <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
+        <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300" disabled><i class="fas fa-arrow-left mr-2"></i>Anterior</button>
+        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Proximo <i class="fas fa-arrow-right ml-2"></i></button>
+      </div>
+    </div>
+
+    <div id="page-1" class="page-content page-active p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 1: A Fundacao e a Escolha do Banco</h2>
+      <div class="info-tag">1. Prisma CLI (dev)</div>
+      <div class="code" id="code-1">npm install prisma --save-dev</div>
+      <p class="text-sm mb-4">Baixa o motor do Prisma (CLI) para desenvolvimento.</p>
+      <div class="info-tag">2. Prisma Client (runtime)</div>
+      <div class="code" id="code-2">npm install @prisma/client</div>
+      <p class="text-sm mb-4">Biblioteca usada pelo Next.js para conversar com o banco.</p>
+      <div class="info-tag">3. Prisma init com provider</div>
+      <div class="code" id="code-3">npx prisma init --datasource-provider sqlite
+npx prisma init --datasource-provider mysql
+npx prisma init --datasource-provider postgresql</div>
+      <p class="text-sm">Escolha apenas um comando conforme o banco desejado.</p>
+    </div>
+
+    <div id="page-2" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 2: O Desenho das Tabelas</h2>
+      <p class="mb-4">Edite o `schema.prisma` com seus modelos e rode:</p>
+      <div class="info-tag">4. Formatar schema</div>
+      <div class="code" id="code-4">npx prisma format</div>
+      <p class="text-sm mb-4">Alinha e organiza o arquivo do schema.</p>
+      <div class="info-tag">5. Validar schema</div>
+      <div class="code" id="code-5">npx prisma validate</div>
+      <p class="text-sm">Detecta erros de tipo, sintaxe e relacionamentos antes de migrar.</p>
+    </div>
+
+    <div id="page-3" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 3: Sincronizacao (Criacao Fisica)</h2>
+      <div class="info-tag">6. Push sem historico</div>
+      <div class="code" id="code-6">npx prisma db push</div>
+      <p class="text-sm mb-4">Empurra o schema direto para o banco, sem migration files.</p>
+      <div class="info-tag">7. Migration de desenvolvimento</div>
+      <div class="code" id="code-7">npx prisma migrate dev --name init</div>
+      <p class="text-sm mb-4">Cria SQL versionado do que mudou no banco.</p>
+      <div class="info-tag">8. Gerar client</div>
+      <div class="code" id="code-8">npx prisma generate</div>
+      <p class="text-sm">Gera tipos TypeScript/autocomplete do Prisma Client.</p>
+    </div>
+
+    <div id="page-4" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 4: Gerenciamento e Testes Iniciais</h2>
+      <div class="info-tag">9. Prisma Studio</div>
+      <div class="code" id="code-9">npx prisma studio</div>
+      <p class="text-sm mb-4">Abre painel web para visualizar e editar registros.</p>
+      <div class="info-tag">10. Seed do banco</div>
+      <div class="code" id="code-10">npx prisma db seed</div>
+      <p class="text-sm">Executa script de dados iniciais (ex: `seed.ts`).</p>
+    </div>
+
+    <div id="page-5" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 5: Manutencao e Troubleshooting</h2>
+      <div class="info-tag">11. Reset local</div>
+      <div class="code" id="code-11">npx prisma migrate reset</div>
+      <p class="text-sm mb-4">Recria banco local com base nas migrations + seed.</p>
+      <div class="info-tag">12. Engenharia reversa</div>
+      <div class="code" id="code-12">npx prisma db pull</div>
+      <p class="text-sm mb-4">Lê banco existente e atualiza `schema.prisma`.</p>
+      <div class="info-tag">13. Resolver migration quebrada</div>
+      <div class="code" id="code-13">npx prisma migrate resolve</div>
+      <p class="text-sm">Marca status de migration quando ocorre falha no meio do processo.</p>
+    </div>
+
+    <div id="page-6" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 6: Deploy (Producao)</h2>
+      <div class="info-tag">14. Aplicar migrations em producao</div>
+      <div class="code" id="code-14">npx prisma migrate deploy</div>
+      <p class="text-sm">Comando seguro para aplicar migrations pendentes no banco real.</p>
+      <div class="bg-green-950/30 p-4 rounded-lg border border-green-800 mt-6">
+        <h3 class="text-green-400 font-bold mb-2"><i class="fas fa-flag-checkered mr-2"></i>Resultado esperado</h3>
+        <p class="text-sm">Você domina o ciclo completo do Prisma: setup, modelagem, migração, testes, recuperação e deploy.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
+    <div class="finish-modal">
+      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluido</h3></div>
+      <div class="modal-body">
+        <p class="text-sm">Voce finalizou o guia interativo de comandos Prisma.</p>
+        <div class="modal-actions">
+          <button id="finish-close" type="button" class="modal-btn secondary">Fechar</button>
+          <button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const totalPages = 6;
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    const finishModalBackdrop = document.getElementById("finish-modal-backdrop");
+
+    function openFinishModal() { finishModalBackdrop.classList.add("show"); }
+    function closeFinishModal() { finishModalBackdrop.classList.remove("show"); }
+
+    function copyTextWithFallback(text) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      return Promise.reject(new Error("Clipboard indisponivel"));
+    }
+
+    function addCopyButtons() {
+      document.querySelectorAll(".code").forEach((el) => {
+        const btn = document.createElement("button");
+        btn.className = "copy-inline mt-2";
+        btn.textContent = "Copiar";
+        el.insertAdjacentElement("afterend", btn);
+        btn.addEventListener("click", async () => {
+          try {
+            await copyTextWithFallback(el.textContent || "");
+            btn.classList.add("copied");
+            btn.textContent = "Copiado!";
+            setTimeout(() => { btn.classList.remove("copied"); btn.textContent = "Copiar"; }, 1200);
+          } catch {
+            btn.textContent = "Erro";
+            setTimeout(() => { btn.textContent = "Copiar"; }, 1200);
+          }
+        });
+      });
+    }
+
+    function goToPage(targetPage) {
+      if (targetPage < 1 || targetPage > totalPages) return;
+      currentPage = targetPage;
+      updatePagination();
+    }
+
+    function updatePagination() {
+      for (let i = 1; i <= totalPages; i++) {
+        document.getElementById(`page-${i}`).classList.remove("page-active");
+        const step = document.getElementById(`step-${i}`);
+        const stepCircle = step.querySelector("div");
+        if (i <= currentPage) {
+          step.classList.add("step-active");
+          step.classList.remove("step-inactive");
+          stepCircle.classList.add("step-active");
+          stepCircle.classList.remove("step-inactive");
+        } else {
+          step.classList.remove("step-active");
+          step.classList.add("step-inactive");
+          stepCircle.classList.remove("step-active");
+          stepCircle.classList.add("step-inactive");
+        }
+      }
+      document.getElementById(`page-${currentPage}`).classList.add("page-active");
+      btnPrev.disabled = currentPage === 1;
+      if (currentPage === totalPages) {
+        btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
+        btnNext.classList.replace("bg-purple-600", "bg-green-600");
+      } else {
+        btnNext.innerHTML = 'Proximo <i class="fas fa-arrow-right ml-2"></i>';
+        btnNext.classList.replace("bg-green-600", "bg-purple-600");
+      }
+    }
+
+    btnNext.addEventListener("click", () => currentPage < totalPages ? goToPage(currentPage + 1) : openFinishModal());
+    btnPrev.addEventListener("click", () => currentPage > 1 && goToPage(currentPage - 1));
+    document.getElementById("finish-close").addEventListener("click", closeFinishModal);
+    document.getElementById("finish-restart").addEventListener("click", () => { closeFinishModal(); goToPage(1); });
+    finishModalBackdrop.addEventListener("click", (event) => event.target === finishModalBackdrop && closeFinishModal());
+
+    document.querySelectorAll("[data-step]").forEach((step) => {
+      const targetPage = Number(step.getAttribute("data-step"));
+      step.addEventListener("click", () => goToPage(targetPage));
+    });
+
+    addCopyButtons();
+  </script>
+</body>
+</html>

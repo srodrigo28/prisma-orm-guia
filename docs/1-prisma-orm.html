@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treinamento Interativo: Next.js + Prisma ORM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { background-color: #0f1214; color: #a3aab1; font-family: "Inter", sans-serif; }
+    .card { background-color: #171d21; border-radius: .75rem; border: 1px solid #1f2937; }
+    .step-active { color: #a855f7; border-color: #a855f7; }
+    .step-inactive { color: #4b5563; border-color: #374151; }
+    .step-clickable { cursor: pointer; }
+    .page-content { display: none; animation: fadeIn .32s ease; }
+    .page-active { display: block; }
+    .code { background: #0f172a; color: #e2e8f0; border: 1px solid #374151; border-radius: .5rem; padding: .875rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: .85rem; line-height: 1.45; white-space: pre; overflow-x: auto; }
+    .info-tag { display: inline-block; font-size: .75rem; font-weight: 700; color: #cbd5e1; background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: .25rem .55rem; margin-bottom: .55rem; }
+    .file-block { border: 1px solid #374151; border-radius: .75rem; background: rgba(15,23,42,.42); overflow: hidden; }
+    .file-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .7rem .8rem; background: rgba(17,24,39,.88); border-bottom: 1px solid #374151; }
+    .file-toggle { display: flex; align-items: center; gap: .55rem; color: #e5e7eb; background: transparent; border: none; font-size: .88rem; font-weight: 700; cursor: pointer; }
+    .file-toggle i { transition: transform .2s ease; color: #a78bfa; }
+    .file-toggle[aria-expanded="true"] i { transform: rotate(90deg); }
+    .actions { display: flex; align-items: center; gap: .4rem; }
+    .mini-btn { border: 1px solid #4b5563; background: #111827; color: #e5e7eb; border-radius: .5rem; font-size: .75rem; font-weight: 600; padding: .35rem .6rem; cursor: pointer; transition: .2s ease; }
+    .mini-btn:hover { background: #1f2937; border-color: #6b7280; }
+    .mini-btn.copied { background: #065f46; border-color: #10b981; color: #d1fae5; }
+    .file-content { display: none; padding: .8rem; }
+    .file-content.open { display: block; }
+    .callout { background: rgba(30,58,138,.22); border: 1px solid #1d4ed8; border-radius: .7rem; padding: .9rem; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(2,6,23,.75); display: none; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+    .modal-backdrop.show { display: flex; }
+    .finish-modal { width: 100%; max-width: 32rem; border-radius: 1rem; border: 1px solid #334155; background: radial-gradient(circle at top right,#1e293b 0%,#111827 55%,#0b1220 100%); color: #cbd5e1; }
+    .modal-head { padding: 1rem 1.25rem; border-bottom: 1px solid #334155; }
+    .modal-body { padding: 1.1rem 1.25rem 1.3rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1rem; }
+    .modal-btn { border-radius: .6rem; padding: .5rem .85rem; font-size: .85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+    .modal-btn.secondary { background: #1f2937; color: #d1d5db; border-color: #374151; }
+    .modal-btn.primary { background: #10b981; color: #052e26; border-color: #34d399; }
+    .code-modal { width: 100%; max-width: 75rem; max-height: 88vh; border-radius: 1rem; border: 1px solid #334155; background: #0b1220; overflow: hidden; display: flex; flex-direction: column; }
+    .code-modal-head { display: flex; align-items: center; justify-content: space-between; padding: .8rem 1rem; border-bottom: 1px solid #334155; background: #111827; }
+    .code-modal-body { padding: .9rem; overflow: auto; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div class="w-full max-w-4xl card shadow-2xl overflow-hidden">
+    <div class="p-6 border-b border-gray-800 bg-[#11161a]">
+      <h1 class="text-2xl font-bold text-white mb-6"><i class="fas fa-database text-purple-500 mr-2"></i>Trilha: Next.js + Prisma ORM + SQLite</h1>
+      <div class="flex items-center justify-between relative">
+        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-800 -z-10"></div>
+        <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2" data-step="1" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div><span class="text-xs hidden sm:block">Setup</span></div>
+        <div id="step-2" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="2" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">2</div><span class="text-xs hidden sm:block">Init</span></div>
+        <div id="step-3" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="3" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">3</div><span class="text-xs hidden sm:block">Schema</span></div>
+        <div id="step-4" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="4" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">4</div><span class="text-xs hidden sm:block">Conexao</span></div>
+        <div id="step-5" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="5" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">5</div><span class="text-xs hidden sm:block">API</span></div>
+        <div id="step-6" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="6" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">6</div><span class="text-xs hidden sm:block">Frontend</span></div>
+        <div id="step-7" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="7" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">7</div><span class="text-xs hidden sm:block">Teste</span></div>
+      </div>
+      <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
+        <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300" disabled><i class="fas fa-arrow-left mr-2"></i>Anterior</button>
+        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Proximo <i class="fas fa-arrow-right ml-2"></i></button>
+      </div>
+    </div>
+
+    <div id="page-1" class="page-content page-active p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🚀 Modulo 1: Criar projeto Next.js</h2>
+      <div class="info-tag">✅ Base do projeto</div>
+      <div class="code">npx create-next-app@latest crud-prisma --ts --tailwind --eslint --src-dir --app --use-npm
+cd crud-prisma</div>
+      <p class="text-sm mt-3">No assistente: YES para React Compiler e NO para customizar alias.</p>
+    </div>
+
+    <div id="page-2" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">📦 Modulo 2: Dependencias e Prisma Init</h2>
+      <div class="info-tag">🧩 Instalar libs</div>
+      <div class="code">npm install @prisma/client @prisma/adapter-better-sqlite3 better-sqlite3 lucide-react
+npm install -D prisma</div>
+      <div class="info-tag mt-4">⚙️ Inicializar Prisma</div>
+      <div class="code">npx prisma init</div>
+    </div>
+
+    <div id="page-3" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🗂️ Modulo 3: Configurar banco</h2>
+      <details class="callout mb-4">
+        <summary class="text-blue-200 font-semibold cursor-pointer">💡 Dica (expandir): ordem recomendada</summary>
+        <p class="text-sm mt-2">1) .env 2) prisma.config.ts 3) schema.prisma.</p>
+      </details>
+      <div class="grid grid-cols-1 gap-4">
+        <div class="file-block">
+          <div class="file-head">
+            <button class="file-toggle" type="button" data-target="panel-env" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>.env</span></button>
+            <div class="actions"><button class="mini-btn" data-copy-target="code-env">Copiar</button><button class="mini-btn" data-expand-target="code-env" data-expand-title=".env">Expandir</button></div>
+          </div>
+          <div id="panel-env" class="file-content"><pre id="code-env" class="code">DATABASE_URL="file:./dev.db"</pre></div>
+        </div>
+        <div class="file-block">
+          <div class="file-head">
+            <button class="file-toggle" type="button" data-target="panel-config" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>prisma.config.ts</span></button>
+            <div class="actions"><button class="mini-btn" data-copy-target="code-config">Copiar</button><button class="mini-btn" data-expand-target="code-config" data-expand-title="prisma.config.ts">Expandir</button></div>
+          </div>
+          <div id="panel-config" class="file-content"><pre id="code-config" class="code">import "dotenv/config";
+import { defineConfig } from "prisma/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: { path: "prisma/migrations" },
+  datasource: { url: process.env["DATABASE_URL"] },
+});</pre></div>
+        </div>
+        <div class="file-block">
+          <div class="file-head">
+            <button class="file-toggle" type="button" data-target="panel-schema" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>prisma/schema.prisma</span></button>
+            <div class="actions"><button class="mini-btn" data-copy-target="code-schema">Copiar</button><button class="mini-btn" data-expand-target="code-schema" data-expand-title="prisma/schema.prisma">Expandir</button></div>
+          </div>
+          <div id="panel-schema" class="file-content"><pre id="code-schema" class="code">generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Produto {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  quantidade   Int
+  preco        Float
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}</pre></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-4" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🧠 Modulo 4: Migration + Singleton</h2>
+      <div class="info-tag">🔁 Criar estrutura fisica</div>
+      <div class="code">npx prisma migrate dev --name init_db
+npx prisma generate</div>
+      <div class="file-block mt-4">
+        <div class="file-head">
+          <button class="file-toggle" type="button" data-target="panel-lib" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>src/app/lib/prisma.ts</span></button>
+          <div class="actions"><button class="mini-btn" data-copy-target="code-lib">Copiar</button><button class="mini-btn" data-expand-target="code-lib" data-expand-title="src/app/lib/prisma.ts">Expandir</button></div>
+        </div>
+        <div id="panel-lib" class="file-content"><pre id="code-lib" class="code">import { PrismaClient } from "@prisma/client";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) throw new Error("DATABASE_URL nao definida no ambiente.");
+
+const adapter = new PrismaBetterSqlite3({ url: databaseUrl });
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter, log: ["query", "error", "warn"] });
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;</pre></div>
+      </div>
+    </div>
+
+    <div id="page-5" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🛠️ Modulo 5: Rotas API</h2>
+      <div class="callout mb-4">
+        <p class="text-sm">Agora com o mesmo formato dos demais modulos: caminho completo + conteudo colapsavel + copiar + expandir.</p>
+      </div>
+      <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mb-4">
+        <p class="text-sm"><strong class="text-white">📘 O que voce vai ver neste modulo:</strong> primeiro a rota geral de produtos (lista e cadastro), depois a rota dinamica por ID (buscar, editar e excluir).</p>
+        <p class="text-sm mt-2"><strong class="text-white">🧠 Dica:</strong> leia os comentarios de cada metodo para entender o papel de `GET`, `POST`, `PUT` e `DELETE` no CRUD.</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4">
+        <div class="file-block">
+          <div class="file-head">
+            <button class="file-toggle" type="button" data-target="panel-api-route" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>src\app\api\produtos\route.ts</span></button>
+            <div class="actions"><button class="mini-btn" data-copy-target="code-api-route">Copiar</button><button class="mini-btn" data-expand-target="code-api-route" data-expand-title="src\\app\\api\\produtos\\route.ts">Expandir</button></div>
+          </div>
+          <div id="panel-api-route" class="file-content">
+            <p class="text-sm mb-3"><strong class="text-white">✨ GET - Listar produtos:</strong> usado para retornar todos os itens, normalmente ordenando por data para mostrar os mais recentes primeiro.</p>
+            <pre class="code">export async function GET() {
+  try {
+    const produtos = await prisma.produto.findMany({
+      orderBy: { criadoEm: "desc" },
+    });
+    return NextResponse.json(produtos);
+  } catch (error) {
+    return NextResponse.json({ error: "Erro ao buscar produtos" }, { status: 500 });
+  }
+}</pre>
+            <p class="text-sm mb-3"><strong class="text-white">🧾 POST - Cadastrar produto:</strong> recebe os dados do body, valida campos obrigatorios, evita nome duplicado e cria o novo registro no banco.</p>
+            <pre class="code">export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { nome, quantidade, preco } = body;
+
+    if (!nome || quantidade === undefined || preco === undefined) {
+      return NextResponse.json(
+        { error: "Campos obrigatórios: nome, quantidade e preco." },
+        { status: 400 }
+      );
+    }
+
+    const produtoExistente = await prisma.produto.findFirst({
+      where: { nome: nome.trim() },
+    });
+
+    if (produtoExistente) {
+      return NextResponse.json(
+        { error: "Já existe um produto cadastrado com esse nome." },
+        { status: 409 }
+      );
+    }
+
+    const novoProduto = await prisma.produto.create({
+      data: {
+        nome,
+        quantidade: Number(quantidade),
+        preco: Number(preco),
+      },
+    });
+
+    return NextResponse.json(novoProduto, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ error: "Erro ao cadastrar produto" }, { status: 400 });
+  }
+}</pre>
+            <details class="callout mt-3">
+              <summary class="text-blue-200 font-semibold cursor-pointer">📄 Ver arquivo completo (base para copiar/expandir)</summary>
+              <pre id="code-api-route" class="code mt-3">import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+// GET: Listar todos os produtos
+export async function GET() {
+  try {
+    const produtos = await prisma.produto.findMany({
+      orderBy: { criadoEm: "desc" },
+    });
+    return NextResponse.json(produtos);
+  } catch (error) {
+    return NextResponse.json({ error: "Erro ao buscar produtos" }, { status: 500 });
+  }
+}
+
+// POST: Criar um novo produto
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { nome, quantidade, preco } = body;
+
+    // Validação de entrada
+    if (!nome || quantidade === undefined || preco === undefined) {
+      return NextResponse.json(
+        { error: "Campos obrigatórios: nome, quantidade e preco." },
+        { status: 400 }
+      );
+    }
+
+    // Verifica se existe com mesmo nome antes de cadastrar
+    const produtoExistente = await prisma.produto.findFirst({
+      where: {
+        nome: nome.trim(),
+      },
+    });
+
+    if (produtoExistente) {
+      return NextResponse.json(
+        { error: "Já existe um produto cadastrado com esse nome." },
+        { status: 409 }
+      );
+    }
+
+    // Chegou aqui cadastra
+    const novoProduto = await prisma.produto.create({
+      data: {
+        nome,
+        quantidade: Number(quantidade),
+        preco: Number(preco),
+      },
+    });
+
+    return NextResponse.json(novoProduto, { status: 201 });
+
+    
+  } catch (error) { // Chegou aqui dar um erro
+    return NextResponse.json({ error: "Erro ao cadastrar produto" }, { status: 400 });
+  }
+}</pre>
+            </details>
+          </div>
+        </div>
+
+        <div class="file-block">
+          <div class="file-head">
+            <button class="file-toggle" type="button" data-target="panel-api-id-route" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>src\app\api\produtos\[id]\route.ts</span></button>
+            <div class="actions"><button class="mini-btn" data-copy-target="code-api-id-route">Copiar</button><button class="mini-btn" data-expand-target="code-api-id-route" data-expand-title="src\\app\\api\\produtos\\[id]\\route.ts">Expandir</button></div>
+          </div>
+          <div id="panel-api-id-route" class="file-content">
+            <p class="text-sm mb-3"><strong class="text-white">🔎 GET by ID - Buscar item unico:</strong> valida o parametro <code>id</code>, consulta um unico produto e retorna 404 quando nao existe.</p>
+            <pre class="code">export async function GET(request: NextRequest, { params }: Context) {
+  try {
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
+
+    if (isNaN(id) || id <= 0) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    }
+
+    const produto = await prisma.produto.findUnique({
+      where: { id },
+    });
+
+    if (!produto) {
+      return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
+    }
+
+    return NextResponse.json(produto);
+  } catch (error) {
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
+  }
+}</pre>
+            <p class="text-sm mb-3"><strong class="text-white">✏️ PUT - Atualizar por ID:</strong> usa o ID da URL para localizar o registro e atualizar os campos recebidos no body.</p>
+            <pre class="code">export async function PUT(request: NextRequest, { params }: Context) {
+  try {
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
+    
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    }
+
+    const body = await request.json();
+
+    const produtoAtualizado = await prisma.produto.update({
+      where: { id },
+      data: {
+        nome: body.nome,
+        quantidade: Number(body.quantidade),
+        preco: Number(body.preco),
+      },
+    });
+
+    return NextResponse.json(produtoAtualizado);
+  } catch (error: any) {
+    console.error("Erro no PUT:", error);
+    return NextResponse.json({ error: "Erro ao atualizar produto" }, { status: 400 });
+  }
+}</pre>
+            <p class="text-sm mb-3"><strong class="text-white">🗑️ DELETE - Remover por ID:</strong> valida o ID, exclui o item e retorna <code>204 No Content</code> quando conclui.</p>
+            <pre class="code">export async function DELETE(request: NextRequest, { params }: Context) {
+  try {
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
+
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    }
+
+    await prisma.produto.delete({
+      where: { id },
+    });
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error: any) {
+    console.error("Erro no DELETE:", error);
+    return NextResponse.json({ error: "Erro ao excluir" }, { status: 400 });
+  }
+}</pre>
+            <details class="callout mt-3">
+              <summary class="text-blue-200 font-semibold cursor-pointer">📄 Ver arquivo completo (base para copiar/expandir)</summary>
+              <pre id="code-api-id-route" class="code mt-3">import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+interface Context {
+  params: Promise&lt;{ id: string }&gt;;
+}
+
+// 1. GET: Buscar produto por ID
+export async function GET(request: NextRequest, { params }: Context) {
+  try {
+    const { id: idParam } = await params; // Unwrapping aqui
+    const id = parseInt(idParam);
+
+    if (isNaN(id) || id &lt;= 0) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    }
+
+    const produto = await prisma.produto.findUnique({
+      where: { id },
+    });
+
+    if (!produto) {
+      return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
+    }
+
+    return NextResponse.json(produto);
+  } catch (error) {
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
+  }
+}
+
+// 2. PUT: Atualizar produto por ID
+export async function PUT(request: NextRequest, { params }: Context) {
+  try {
+    const { id: idParam } = await params; // Unwrapping aqui
+    const id = parseInt(idParam);
+    
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    }
+
+    const body = await request.json();
+
+    const produtoAtualizado = await prisma.produto.update({
+      where: { id },
+      data: {
+        nome: body.nome,
+        quantidade: Number(body.quantidade),
+        preco: Number(body.preco),
+      },
+    });
+
+    return NextResponse.json(produtoAtualizado);
+  } catch (error: any) {
+    console.error("Erro no PUT:", error);
+    return NextResponse.json({ error: "Erro ao atualizar produto" }, { status: 400 });
+  }
+}
+
+// 3. DELETE: Excluir produto por ID
+export async function DELETE(request: NextRequest, { params }: Context) {
+  try {
+    const { id: idParam } = await params; // Unwrapping aqui
+    const id = parseInt(idParam);
+
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    }
+
+    await prisma.produto.delete({
+      where: { id },
+    });
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error: any) {
+    console.error("Erro no DELETE:", error);
+    return NextResponse.json({ error: "Erro ao excluir" }, { status: 400 });
+  }
+}</pre>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-6" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">🖥️ Modulo 6: Frontend completo (prioridade)</h2>
+      <details class="callout mb-4">
+        <summary class="text-blue-200 font-semibold cursor-pointer">📘 Expandir notas do frontend</summary>
+        <p class="text-sm mt-2">Aqui esta o arquivo completo de <code>src/app/page.tsx</code>, com opcao de <strong class="text-white">Copiar</strong> e <strong class="text-white">Expandir</strong>.</p>
+      </details>
+      <div class="file-block">
+        <div class="file-head">
+          <button class="file-toggle" type="button" data-target="panel-front" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>src/app/page.tsx (completo)</span></button>
+          <div class="actions"><button class="mini-btn" data-copy-target="code-front">Copiar</button><button class="mini-btn" data-expand-target="code-front" data-expand-title="src/app/page.tsx">Expandir</button></div>
+        </div>
+        <div id="panel-front" class="file-content"><pre id="code-front" class="code">"use client";
+
+import { useState, useEffect, useMemo } from "react";
+import { Plus, Search, Edit2, Trash2, Loader2, X } from "lucide-react";
+
+interface Produto {
+  id: number;
+  nome: string;
+  quantidade: number;
+  preco: number;
+  criadoEm: string;
+}
+
+export default function ProdutosPage() {
+  const [produtos, setProdutos] = useState&lt;Produto[]&gt;([]);
+  const [busca, setBusca] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState&lt;string | null&gt;(null);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [idEditando, setIdEditando] = useState&lt;number | null&gt;(null);
+  const [formData, setFormData] = useState({ nome: "", quantidade: 0, preco: 0 });
+
+  const carregarProdutos = async () =&gt; {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/produtos");
+      if (!res.ok) throw new Error("Falha ao carregar produtos");
+      const data = await res.json();
+      setProdutos(data);
+    } catch (err) {
+      setErro("Nao foi possivel carregar a lista de produtos.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() =&gt; { carregarProdutos(); }, []);
+
+  const handleSalvar = async (e: React.FormEvent) =&gt; {
+    e.preventDefault();
+    setSalvando(true);
+    const metodo = idEditando ? "PUT" : "POST";
+    const url = idEditando ? `/api/produtos/${idEditando}` : "/api/produtos";
+    try {
+      const res = await fetch(url, {
+        method: metodo,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error("Erro ao salvar produto");
+      await carregarProdutos();
+      fecharModal();
+    } catch (err) {
+      alert("Erro ao salvar. Verifique os dados.");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const handleExcluir = async (id: number) =&gt; {
+    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+    try {
+      const res = await fetch(`/api/produtos/${id}`, { method: "DELETE" });
+      if (res.ok) carregarProdutos();
+    } catch (err) {
+      alert("Erro ao excluir produto.");
+    }
+  };
+
+  const produtosFiltrados = useMemo(() =&gt; {
+    return produtos.filter((p) =&gt; p.nome.toLowerCase().includes(busca.toLowerCase()));
+  }, [busca, produtos]);
+
+  const abrirModal = (produto?: Produto) =&gt; {
+    if (produto) {
+      setIdEditando(produto.id);
+      setFormData({ nome: produto.nome, quantidade: produto.quantidade, preco: produto.preco });
+    } else {
+      setIdEditando(null);
+      setFormData({ nome: "", quantidade: 0, preco: 0 });
+    }
+    setModalAberto(true);
+  };
+
+  const fecharModal = () =&gt; {
+    setModalAberto(false);
+    setIdEditando(null);
+  };
+
+  return (
+    &lt;main className="min-h-screen bg-gray-50 p-4 md:p-8"&gt;
+      &lt;div className="max-w-6xl mx-auto"&gt;
+        &lt;div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"&gt;
+          &lt;h1 className="text-3xl font-bold text-gray-800"&gt;Estoque de Produtos&lt;/h1&gt;
+          &lt;div className="flex gap-2"&gt;
+            &lt;div className="relative flex-1"&gt;
+              &lt;Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" /&gt;
+              &lt;input type="text" placeholder="Buscar produto..." className="pl-10 pr-4 py-2 border rounded-lg w-full focus:ring-2 focus:ring-blue-500 outline-none" value={busca} onChange={(e) =&gt; setBusca(e.target.value)} /&gt;
+            &lt;/div&gt;
+            &lt;button onClick={() =&gt; abrirModal()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"&gt;
+              &lt;Plus className="w-5 h-5" /&gt; &lt;span className="hidden sm:inline"&gt;Adicionar&lt;/span&gt;
+            &lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        {loading && (
+          &lt;div className="flex justify-center py-20"&gt;
+            &lt;Loader2 className="w-10 h-10 animate-spin text-blue-600" /&gt;
+          &lt;/div&gt;
+        )}
+        {erro && &lt;div className="bg-red-100 text-red-700 p-4 rounded-lg"&gt;{erro}&lt;/div&gt;}
+        {!loading && produtosFiltrados.length === 0 && (
+          &lt;div className="text-center py-20 text-gray-500 italic"&gt;Nenhum produto encontrado.&lt;/div&gt;
+        )}
+
+        &lt;div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"&gt;
+          {produtosFiltrados.map((produto) =&gt; (
+            &lt;div key={produto.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"&gt;
+              &lt;div className="flex justify-between items-start mb-4"&gt;
+                &lt;h3 className="text-xl font-semibold text-gray-800"&gt;{produto.nome}&lt;/h3&gt;
+                &lt;div className="flex gap-2"&gt;
+                  &lt;button onClick={() =&gt; abrirModal(produto)} className="text-gray-400 hover:text-blue-600"&gt;&lt;Edit2 className="w-5 h-5" /&gt;&lt;/button&gt;
+                  &lt;button onClick={() =&gt; handleExcluir(produto.id)} className="text-gray-400 hover:text-red-600"&gt;&lt;Trash2 className="w-5 h-5" /&gt;&lt;/button&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div className="space-y-2"&gt;
+                &lt;p className="text-gray-600"&gt;Qtd: &lt;span className="font-medium text-gray-900"&gt;{produto.quantidade}&lt;/span&gt;&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-blue-600"&gt;R$ {produto.preco.toFixed(2)}&lt;/p&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {modalAberto && (
+        &lt;div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"&gt;
+          &lt;div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl"&gt;
+            &lt;div className="flex justify-between items-center mb-6"&gt;
+              &lt;h2 className="text-2xl font-bold"&gt;{idEditando ? "Editar Produto" : "Novo Produto"}&lt;/h2&gt;
+              &lt;button onClick={fecharModal} className="text-gray-400 hover:text-gray-600"&gt;&lt;X /&gt;&lt;/button&gt;
+            &lt;/div&gt;
+            &lt;form onSubmit={handleSalvar} className="space-y-4"&gt;
+              &lt;div&gt;
+                &lt;label className="block text-sm font-medium text-gray-700 mb-1"&gt;Nome&lt;/label&gt;
+                &lt;input required type="text" className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={formData.nome} onChange={(e) =&gt; setFormData({ ...formData, nome: e.target.value })} /&gt;
+              &lt;/div&gt;
+              &lt;div className="grid grid-cols-2 gap-4"&gt;
+                &lt;div&gt;
+                  &lt;label className="block text-sm font-medium text-gray-700 mb-1"&gt;Quantidade&lt;/label&gt;
+                  &lt;input required type="number" min="0" className="w-full border p-2 rounded-lg" value={isNaN(formData.quantidade) ? "" : formData.quantidade} onChange={(e) =&gt; setFormData({ ...formData, quantidade: parseInt(e.target.value) })} /&gt;
+                &lt;/div&gt;
+                &lt;div&gt;
+                  &lt;label className="block text-sm font-medium text-gray-700 mb-1"&gt;Preco (R$)&lt;/label&gt;
+                  &lt;input required type="number" step="0.01" min="0" className="w-full border p-2 rounded-lg" value={isNaN(formData.preco) ? "" : formData.preco} onChange={(e) =&gt; setFormData({ ...formData, preco: parseFloat(e.target.value) })} /&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+              &lt;button disabled={salvando} type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 flex justify-center"&gt;
+                {salvando ? &lt;Loader2 className="animate-spin" /&gt; : "Confirmar e Salvar"}
+              &lt;/button&gt;
+            &lt;/form&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/main&gt;
+  );
+}</pre></div>
+      </div>
+    </div>
+
+    <div id="page-7" class="page-content p-6 sm:p-10">
+      <h2 class="text-xl font-semibold text-white mb-4">✅ Modulo 7: Teste</h2>
+      <div class="info-tag">🚀 Rodar aplicacao</div>
+      <div class="code">npm run dev</div>
+      <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mt-4">
+        <h3 class="text-white font-semibold mb-3">🧩 Recursos criados no projeto</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="info-tag">🆕 Cadastro de produto</span>
+          <span class="info-tag">📋 Listagem em cards</span>
+          <span class="info-tag">🔎 Busca por nome</span>
+          <span class="info-tag">🪟 Modal criar/editar</span>
+          <span class="info-tag">✏️ Edicao de produto</span>
+          <span class="info-tag">🗑️ Exclusao de produto</span>
+          <span class="info-tag">⏳ Loading e feedback de erro</span>
+        </div>
+      </div>
+      <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mt-4">
+        <h3 class="text-white font-semibold mb-3">✅ Checklist de validacao</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="info-tag">🆕 Criar produto</span>
+          <span class="info-tag">🔎 Buscar por nome</span>
+          <span class="info-tag">✏️ Editar produto</span>
+          <span class="info-tag">🗑️ Excluir produto</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
+    <div class="finish-modal">
+      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluido</h3></div>
+      <div class="modal-body">
+        <p class="text-sm">Voce finalizou a trilha Prisma ORM.</p>
+        <div class="modal-actions"><button id="finish-close" type="button" class="modal-btn secondary">Fechar</button><button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="code-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="code-title">
+    <div class="code-modal">
+      <div class="code-modal-head">
+        <h3 id="code-title" class="text-sm font-semibold text-white">Codigo</h3>
+        <div class="actions"><button id="code-copy" class="mini-btn" type="button">Copiar</button><button id="code-close" class="mini-btn" type="button">Fechar</button></div>
+      </div>
+      <div class="code-modal-body"><pre id="code-content" class="code"></pre></div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const totalPages = 7;
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    const finishModalBackdrop = document.getElementById("finish-modal-backdrop");
+    const codeModalBackdrop = document.getElementById("code-modal-backdrop");
+    const codeContent = document.getElementById("code-content");
+    const codeTitle = document.getElementById("code-title");
+    const codeCopy = document.getElementById("code-copy");
+
+    function copyTextWithFallback(text) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      return Promise.reject(new Error("Clipboard indisponivel"));
+    }
+
+    function bindCopyButton(button, targetElement) {
+      button.addEventListener("click", async () => {
+        try {
+          await copyTextWithFallback(targetElement.textContent || "");
+          const old = button.textContent;
+          button.classList.add("copied");
+          button.textContent = "Copiado!";
+          setTimeout(() => { button.classList.remove("copied"); button.textContent = old || "Copiar"; }, 1200);
+        } catch {
+          const old = button.textContent;
+          button.textContent = "Erro";
+          setTimeout(() => { button.textContent = old || "Copiar"; }, 1200);
+        }
+      });
+    }
+
+    document.querySelectorAll(".mini-btn[data-copy-target]").forEach((button) => {
+      const target = document.getElementById(button.getAttribute("data-copy-target"));
+      if (target) bindCopyButton(button, target);
+    });
+
+    document.querySelectorAll(".file-toggle[data-target]").forEach((toggle) => {
+      const panel = document.getElementById(toggle.getAttribute("data-target"));
+      if (!panel) return;
+      toggle.addEventListener("click", () => {
+        const isOpen = panel.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+    });
+
+    document.querySelectorAll(".mini-btn[data-expand-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.getAttribute("data-expand-target"));
+        if (!target) return;
+        codeTitle.textContent = button.getAttribute("data-expand-title") || "Codigo";
+        codeContent.textContent = target.textContent || "";
+        codeModalBackdrop.classList.add("show");
+      });
+    });
+
+    bindCopyButton(codeCopy, codeContent);
+    document.getElementById("code-close").addEventListener("click", () => codeModalBackdrop.classList.remove("show"));
+    codeModalBackdrop.addEventListener("click", (event) => { if (event.target === codeModalBackdrop) codeModalBackdrop.classList.remove("show"); });
+    document.getElementById("finish-close").addEventListener("click", () => finishModalBackdrop.classList.remove("show"));
+    document.getElementById("finish-restart").addEventListener("click", () => { finishModalBackdrop.classList.remove("show"); goToPage(1); });
+    finishModalBackdrop.addEventListener("click", (event) => { if (event.target === finishModalBackdrop) finishModalBackdrop.classList.remove("show"); });
+
+    function goToPage(targetPage) {
+      if (targetPage < 1 || targetPage > totalPages) return;
+      currentPage = targetPage;
+      updatePagination();
+    }
+
+    function updatePagination() {
+      for (let i = 1; i <= totalPages; i++) {
+        document.getElementById(`page-${i}`).classList.remove("page-active");
+        const step = document.getElementById(`step-${i}`);
+        const stepCircle = step.querySelector("div");
+        if (i <= currentPage) {
+          step.classList.add("step-active");
+          step.classList.remove("step-inactive");
+          stepCircle.classList.add("step-active");
+          stepCircle.classList.remove("step-inactive");
+        } else {
+          step.classList.remove("step-active");
+          step.classList.add("step-inactive");
+          stepCircle.classList.remove("step-active");
+          stepCircle.classList.add("step-inactive");
+        }
+      }
+      document.getElementById(`page-${currentPage}`).classList.add("page-active");
+      btnPrev.disabled = currentPage === 1;
+      if (currentPage === totalPages) {
+        btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
+        btnNext.classList.replace("bg-purple-600", "bg-green-600");
+      } else {
+        btnNext.innerHTML = 'Proximo <i class="fas fa-arrow-right ml-2"></i>';
+        btnNext.classList.replace("bg-green-600", "bg-purple-600");
+      }
+    }
+
+    btnNext.addEventListener("click", () => currentPage < totalPages ? goToPage(currentPage + 1) : finishModalBackdrop.classList.add("show"));
+    btnPrev.addEventListener("click", () => currentPage > 1 && goToPage(currentPage - 1));
+    document.querySelectorAll("[data-step]").forEach((step) => {
+      const targetPage = Number(step.getAttribute("data-step"));
+      step.addEventListener("click", () => goToPage(targetPage));
+      step.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          goToPage(targetPage);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
