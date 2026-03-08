@@ -5,9 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const produtos = await prisma.produto.findMany({
-      orderBy: {
-        criadoEm: "desc",
-      },
+      orderBy: { criadoEm: "desc" },
     });
     return NextResponse.json(produtos);
   } catch (error) {
@@ -29,6 +27,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verifica se existe com mesmo nome antes de cadastrar
+    const produtoExistente = await prisma.produto.findFirst({
+      where: {
+        nome: nome.trim(),
+      },
+    });
+
+    if (produtoExistente) {
+      return NextResponse.json(
+        { error: "Já existe um produto cadastrado com esse nome." },
+        { status: 409 }
+      );
+    }
+
+    // Chegou aqui cadastra
     const novoProduto = await prisma.produto.create({
       data: {
         nome,
@@ -38,7 +51,9 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(novoProduto, { status: 201 });
-  } catch (error) {
+
+    
+  } catch (error) { // Chegou aqui dar um erro
     return NextResponse.json({ error: "Erro ao cadastrar produto" }, { status: 400 });
   }
 }
