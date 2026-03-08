@@ -59,12 +59,12 @@
       </div>
       <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
         <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300" disabled><i class="fas fa-arrow-left mr-2"></i>Anterior</button>
-        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Proximo <i class="fas fa-arrow-right ml-2"></i></button>
+        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Próximo <i class="fas fa-arrow-right ml-2"></i></button>
       </div>
     </div>
 
     <div id="page-1" class="page-content page-active p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🚀 Modulo 1: Criar projeto Next.js</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🚀 Módulo 1: Criar projeto Next.js</h2>
       <div class="info-tag">✅ Base do projeto</div>
       <div class="code">npx create-next-app@latest crud-prisma --ts --tailwind --eslint --src-dir --app --use-npm
 cd crud-prisma</div>
@@ -72,7 +72,7 @@ cd crud-prisma</div>
     </div>
 
     <div id="page-2" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">📦 Modulo 2: Dependencias e Prisma Init</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">📦 Módulo 2: Dependências e Prisma Init</h2>
       <div class="info-tag">🧩 Instalar libs</div>
       <div class="code">npm install @prisma/client @prisma/adapter-better-sqlite3 better-sqlite3 lucide-react
 npm install -D prisma</div>
@@ -81,7 +81,7 @@ npm install -D prisma</div>
     </div>
 
     <div id="page-3" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🗂️ Modulo 3: Configurar banco</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🗂️ Módulo 3: Configurar banco</h2>
       <details class="callout mb-4">
         <summary class="text-blue-200 font-semibold cursor-pointer">💡 Dica (expandir): ordem recomendada</summary>
         <p class="text-sm mt-2">1) .env 2) prisma.config.ts 3) schema.prisma.</p>
@@ -134,8 +134,8 @@ model Produto {
     </div>
 
     <div id="page-4" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🧠 Modulo 4: Migration + Singleton</h2>
-      <div class="info-tag">🔁 Criar estrutura fisica</div>
+      <h2 class="text-xl font-semibold text-white mb-4">🧠 Módulo 4: Migration + Singleton</h2>
+      <div class="info-tag">🔁 Criar estrutura física</div>
       <div class="code">npx prisma migrate dev --name init_db
 npx prisma generate</div>
       <div class="file-block mt-4">
@@ -147,7 +147,7 @@ npx prisma generate</div>
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
 const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) throw new Error("DATABASE_URL nao definida no ambiente.");
+if (!databaseUrl) throw new Error("DATABASE_URL não definida no ambiente.");
 
 const adapter = new PrismaBetterSqlite3({ url: databaseUrl });
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
@@ -158,13 +158,13 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;</pre
     </div>
 
     <div id="page-5" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🛠️ Modulo 5: Rotas API</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🛠️ Módulo 5: Rotas API</h2>
       <div class="callout mb-4">
-        <p class="text-sm">Agora com o mesmo formato dos demais modulos: caminho completo + conteudo colapsavel + copiar + expandir.</p>
+        <p class="text-sm">Agora com o mesmo formato dos demais módulos: caminho completo + conteúdo colapsável + copiar + expandir.</p>
       </div>
       <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mb-4">
-        <p class="text-sm"><strong class="text-white">📘 O que voce vai ver neste modulo:</strong> primeiro a rota geral de produtos (lista e cadastro), depois a rota dinamica por ID (buscar, editar e excluir).</p>
-        <p class="text-sm mt-2"><strong class="text-white">🧠 Dica:</strong> leia os comentarios de cada metodo para entender o papel de `GET`, `POST`, `PUT` e `DELETE` no CRUD.</p>
+        <p class="text-sm"><strong class="text-white">📘 O que voce vai ver neste módulo:</strong> primeiro a rota geral de produtos (lista e cadastro), depois a rota dinâmica por ID (buscar, editar e excluir).</p>
+        <p class="text-sm mt-2"><strong class="text-white">🧠 Dica:</strong> leia os comentarios de cada método para entender o papel de `GET`, `POST`, `PUT` e `DELETE` no CRUD.</p>
       </div>
 
       <div class="grid grid-cols-1 gap-4">
@@ -185,7 +185,7 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;</pre
     return NextResponse.json({ error: "Erro ao buscar produtos" }, { status: 500 });
   }
 }</pre>
-            <p class="text-sm mb-3"><strong class="text-white">🧾 POST - Cadastrar produto:</strong> recebe os dados do body, valida campos obrigatorios, evita nome duplicado e cria o novo registro no banco.</p>
+            <p class="text-sm mb-3"><strong class="text-white">🧾 POST - Cadastrar produto:</strong> recebe os dados do body, valida campos obrigatórios, evita nome duplicado e cria o novo registro no banco.</p>
             <pre class="code">export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -293,7 +293,7 @@ export async function POST(request: Request) {
             <div class="actions"><button class="mini-btn" data-copy-target="code-api-id-route">Copiar</button><button class="mini-btn" data-expand-target="code-api-id-route" data-expand-title="src\\app\\api\\produtos\\[id]\\route.ts">Expandir</button></div>
           </div>
           <div id="panel-api-id-route" class="file-content">
-            <p class="text-sm mb-3"><strong class="text-white">🔎 GET by ID - Buscar item unico:</strong> valida o parametro <code>id</code>, consulta um unico produto e retorna 404 quando nao existe.</p>
+            <p class="text-sm mb-3"><strong class="text-white">🔎 GET by ID - Buscar item único:</strong> valida o parâmetro <code>id</code>, consulta um único produto e retorna 404 quando não existe.</p>
             <pre class="code">export async function GET(request: NextRequest, { params }: Context) {
   try {
     const { id: idParam } = await params;
@@ -451,7 +451,7 @@ export async function DELETE(request: NextRequest, { params }: Context) {
     </div>
 
     <div id="page-6" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🖥️ Modulo 6: Frontend completo (prioridade)</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🖥️ Módulo 6: Frontend completo (prioridade)</h2>
       <details class="callout mb-4">
         <summary class="text-blue-200 font-semibold cursor-pointer">📘 Expandir notas do frontend</summary>
         <p class="text-sm mt-2">Aqui esta o arquivo completo de <code>src/app/page.tsx</code>, com opcao de <strong class="text-white">Copiar</strong> e <strong class="text-white">Expandir</strong>.</p>
@@ -492,7 +492,7 @@ export default function ProdutosPage() {
       const data = await res.json();
       setProdutos(data);
     } catch (err) {
-      setErro("Nao foi possivel carregar a lista de produtos.");
+      setErro("Não foi possível carregar a lista de produtos.");
     } finally {
       setLoading(false);
     }
@@ -503,11 +503,11 @@ export default function ProdutosPage() {
   const handleSalvar = async (e: React.FormEvent) =&gt; {
     e.preventDefault();
     setSalvando(true);
-    const metodo = idEditando ? "PUT" : "POST";
+    const método = idEditando ? "PUT" : "POST";
     const url = idEditando ? `/api/produtos/${idEditando}` : "/api/produtos";
     try {
       const res = await fetch(url, {
-        method: metodo,
+        method: método,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -632,8 +632,8 @@ export default function ProdutosPage() {
     </div>
 
     <div id="page-7" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">✅ Modulo 7: Teste</h2>
-      <div class="info-tag">🚀 Rodar aplicacao</div>
+      <h2 class="text-xl font-semibold text-white mb-4">✅ Módulo 7: Teste</h2>
+      <div class="info-tag">🚀 Rodar aplicação</div>
       <div class="code">npm run dev</div>
       <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mt-4">
         <h3 class="text-white font-semibold mb-3">🧩 Recursos criados no projeto</h3>
@@ -642,13 +642,13 @@ export default function ProdutosPage() {
           <span class="info-tag">📋 Listagem em cards</span>
           <span class="info-tag">🔎 Busca por nome</span>
           <span class="info-tag">🪟 Modal criar/editar</span>
-          <span class="info-tag">✏️ Edicao de produto</span>
-          <span class="info-tag">🗑️ Exclusao de produto</span>
+          <span class="info-tag">✏️ Edição de produto</span>
+          <span class="info-tag">🗑️ Exclusão de produto</span>
           <span class="info-tag">⏳ Loading e feedback de erro</span>
         </div>
       </div>
       <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mt-4">
-        <h3 class="text-white font-semibold mb-3">✅ Checklist de validacao</h3>
+        <h3 class="text-white font-semibold mb-3">✅ Checklist de validação</h3>
         <div class="flex flex-wrap gap-2">
           <span class="info-tag">🆕 Criar produto</span>
           <span class="info-tag">🔎 Buscar por nome</span>
@@ -661,9 +661,9 @@ export default function ProdutosPage() {
 
   <div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
     <div class="finish-modal">
-      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluido</h3></div>
+      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluído</h3></div>
       <div class="modal-body">
-        <p class="text-sm">Voce finalizou a trilha Prisma ORM.</p>
+        <p class="text-sm">Você finalizou a trilha Prisma ORM.</p>
         <div class="modal-actions"><button id="finish-close" type="button" class="modal-btn secondary">Fechar</button><button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button></div>
       </div>
     </div>
@@ -672,7 +672,7 @@ export default function ProdutosPage() {
   <div id="code-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="code-title">
     <div class="code-modal">
       <div class="code-modal-head">
-        <h3 id="code-title" class="text-sm font-semibold text-white">Codigo</h3>
+        <h3 id="code-title" class="text-sm font-semibold text-white">Código</h3>
         <div class="actions"><button id="code-copy" class="mini-btn" type="button">Copiar</button><button id="code-close" class="mini-btn" type="button">Fechar</button></div>
       </div>
       <div class="code-modal-body"><pre id="code-content" class="code"></pre></div>
@@ -692,7 +692,7 @@ export default function ProdutosPage() {
 
     function copyTextWithFallback(text) {
       if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
-      return Promise.reject(new Error("Clipboard indisponivel"));
+      return Promise.reject(new Error("Clipboard indisponível"));
     }
 
     function bindCopyButton(button, targetElement) {
@@ -729,7 +729,7 @@ export default function ProdutosPage() {
       button.addEventListener("click", () => {
         const target = document.getElementById(button.getAttribute("data-expand-target"));
         if (!target) return;
-        codeTitle.textContent = button.getAttribute("data-expand-title") || "Codigo";
+        codeTitle.textContent = button.getAttribute("data-expand-title") || "Código";
         codeContent.textContent = target.textContent || "";
         codeModalBackdrop.classList.add("show");
       });
@@ -771,7 +771,7 @@ export default function ProdutosPage() {
         btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
         btnNext.classList.replace("bg-purple-600", "bg-green-600");
       } else {
-        btnNext.innerHTML = 'Proximo <i class="fas fa-arrow-right ml-2"></i>';
+        btnNext.innerHTML = 'Próximo <i class="fas fa-arrow-right ml-2"></i>';
         btnNext.classList.replace("bg-green-600", "bg-purple-600");
       }
     }
@@ -791,3 +791,5 @@ export default function ProdutosPage() {
   </script>
 </body>
 </html>
+
+

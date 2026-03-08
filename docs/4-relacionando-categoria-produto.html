@@ -53,19 +53,19 @@
         <div id="step-2" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="2" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">2</div><span class="text-xs hidden sm:block">Schema</span></div>
         <div id="step-3" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="3" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">3</div><span class="text-xs hidden sm:block">API</span></div>
         <div id="step-4" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="4" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">4</div><span class="text-xs hidden sm:block">Front</span></div>
-        <div id="step-5" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="5" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">5</div><span class="text-xs hidden sm:block">Migracao</span></div>
+        <div id="step-5" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="5" role="button" tabindex="0"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">5</div><span class="text-xs hidden sm:block">Migração</span></div>
       </div>
       <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
         <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300" disabled><i class="fas fa-arrow-left mr-2"></i>Anterior</button>
-        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Proximo <i class="fas fa-arrow-right ml-2"></i></button>
+        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Próximo <i class="fas fa-arrow-right ml-2"></i></button>
       </div>
     </div>
 
     <div id="page-1" class="page-content page-active p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🎯 Modulo 1: O que muda com o relacionamento</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🎯 Módulo 1: O que muda com o relacionamento</h2>
       <div class="callout mb-4">
-        <p class="text-sm"><strong class="text-white">Regra de negocio:</strong> uma <code>Categoria</code> pode ter muitos <code>Produto</code>s, e cada produto pertence a uma categoria.</p>
-        <p class="text-sm mt-2"><strong class="text-white">Tipo da relacao:</strong> <code>1:N</code> (um para muitos).</p>
+        <p class="text-sm"><strong class="text-white">Regra de negócio:</strong> uma <code>Categoria</code> pode ter muitos <code>Produto</code>s, e cada produto pertence a uma categoria.</p>
+        <p class="text-sm mt-2"><strong class="text-white">Tipo da relação:</strong> <code>1:N</code> (um para muitos).</p>
       </div>
       <div class="flex flex-wrap gap-2">
         <span class="info-tag">1️⃣ Categoria -> N Produtos</span>
@@ -75,7 +75,7 @@
     </div>
 
     <div id="page-2" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🗂️ Modulo 2: Atualizar schema completo</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🗂️ Módulo 2: Atualizar schema completo</h2>
       <div class="file-block">
         <div class="file-head">
           <button class="file-toggle" type="button" data-target="panel-schema" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>prisma\schema.prisma</span></button>
@@ -112,7 +112,7 @@ model Produto {
     </div>
 
     <div id="page-3" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🛠️ Modulo 3: Ajustes na API de produtos</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🛠️ Módulo 3: Ajustes na API de produtos</h2>
       <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700 mb-4">
         <p class="text-sm"><strong class="text-white">📘 Objetivo:</strong> salvar e retornar a categoria junto dos produtos.</p>
       </div>
@@ -168,7 +168,7 @@ const produtoAtualizado = await prisma.produto.update({
     </div>
 
     <div id="page-4" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">🖥️ Modulo 4: Ajustes no frontend</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">🖥️ Módulo 4: Ajustes no frontend</h2>
       <div class="file-block">
         <div class="file-head">
           <button class="file-toggle" type="button" data-target="panel-front" aria-expanded="false"><i class="fas fa-chevron-right"></i><span>src\app\page.tsx</span></button>
@@ -247,7 +247,7 @@ const handleCriarCategoriaRapida = async () =&gt; {
   &lt;/div&gt;
 &lt;/div&gt;
 
-// Formulario rapido de nova categoria
+// Formulário rapido de nova categoria
 {mostrarFormCategoria && (
   &lt;div className="rounded-lg border border-blue-200 bg-blue-50/60 p-3"&gt;
     &lt;input placeholder="Nome da categoria" value={novaCategoria.nome} onChange={(e) =&gt; setNovaCategoria({ ...novaCategoria, nome: e.target.value })} /&gt;
@@ -271,8 +271,8 @@ const payload = {
     </div>
 
     <div id="page-5" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">✅ Modulo 5: Migration e validacao</h2>
-      <div class="info-tag">1. Aplicar mudanca no banco</div>
+      <h2 class="text-xl font-semibold text-white mb-4">✅ Módulo 5: Migration e validação</h2>
+      <div class="info-tag">1. Aplicar mudança no banco</div>
       <div class="code">npx prisma migrate dev --name relaciona_categoria_produto</div>
       <div class="info-tag mt-4">2. Regenerar client</div>
       <div class="code">npx prisma generate</div>
@@ -289,9 +289,9 @@ npx prisma studio</div>
 
   <div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
     <div class="finish-modal">
-      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluido</h3></div>
+      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluído</h3></div>
       <div class="modal-body">
-        <p class="text-sm">Relacao Categoria x Produto concluida com sucesso.</p>
+        <p class="text-sm">Relação Categoria x Produto concluída com sucesso.</p>
         <div class="modal-actions"><button id="finish-close" type="button" class="modal-btn secondary">Fechar</button><button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button></div>
       </div>
     </div>
@@ -300,7 +300,7 @@ npx prisma studio</div>
   <div id="code-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="code-title">
     <div class="code-modal">
       <div class="code-modal-head">
-        <h3 id="code-title" class="text-sm font-semibold text-white">Codigo</h3>
+        <h3 id="code-title" class="text-sm font-semibold text-white">Código</h3>
         <div class="actions"><button id="code-copy" class="mini-btn" type="button">Copiar</button><button id="code-close" class="mini-btn" type="button">Fechar</button></div>
       </div>
       <div class="code-modal-body"><pre id="code-content" class="code"></pre></div>
@@ -320,7 +320,7 @@ npx prisma studio</div>
 
     function copyTextWithFallback(text) {
       if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
-      return Promise.reject(new Error("Clipboard indisponivel"));
+      return Promise.reject(new Error("Clipboard indisponível"));
     }
 
     function bindCopyButton(button, targetElement) {
@@ -357,7 +357,7 @@ npx prisma studio</div>
       button.addEventListener("click", () => {
         const target = document.getElementById(button.getAttribute("data-expand-target"));
         if (!target) return;
-        codeTitle.textContent = button.getAttribute("data-expand-title") || "Codigo";
+        codeTitle.textContent = button.getAttribute("data-expand-title") || "Código";
         codeContent.textContent = target.textContent || "";
         codeModalBackdrop.classList.add("show");
       });
@@ -399,7 +399,7 @@ npx prisma studio</div>
         btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
         btnNext.classList.replace("bg-purple-600", "bg-green-600");
       } else {
-        btnNext.innerHTML = 'Proximo <i class="fas fa-arrow-right ml-2"></i>';
+        btnNext.innerHTML = 'Próximo <i class="fas fa-arrow-right ml-2"></i>';
         btnNext.classList.replace("bg-green-600", "bg-purple-600");
       }
     }
@@ -419,3 +419,4 @@ npx prisma studio</div>
   </script>
 </body>
 </html>
+

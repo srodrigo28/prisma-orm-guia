@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prisma:check": "node scripts/prisma-check.mjs",
+    "predev": "npm run prisma:check",
+    "prebuild": "npm run prisma:check",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

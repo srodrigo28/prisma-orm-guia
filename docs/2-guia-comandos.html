@@ -16,6 +16,13 @@
     .page-active { display: block; }
     .code { background: #0f172a; color: #e2e8f0; border: 1px solid #374151; border-radius: .5rem; padding: .875rem; font-family: ui-monospace, monospace; font-size: .85rem; line-height: 1.45; white-space: pre; overflow-x: auto; }
     .info-tag { display: inline-block; font-size: .75rem; font-weight: 700; color: #cbd5e1; background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: .25rem .55rem; margin-bottom: .55rem; }
+    .warn-box { background: rgba(120,53,15,.25); border: 1px solid #b45309; border-radius: .7rem; padding: .85rem; margin: .7rem 0 1rem; }
+    .warn-badge { display: inline-block; font-size: .72rem; font-weight: 800; color: #fde68a; background: #78350f; border: 1px solid #d97706; border-radius: 999px; padding: .2rem .55rem; margin-bottom: .45rem; letter-spacing: .02em; }
+    .provider-list { border: 1px solid #374151; border-radius: .75rem; overflow: hidden; background: rgba(17,24,39,.45); margin-top: .35rem; }
+    .provider-item { padding: .8rem; border-top: 1px solid #374151; }
+    .provider-item:first-child { border-top: none; }
+    .provider-badge { display: inline-block; font-size: .74rem; font-weight: 700; color: #e2e8f0; background: #1f2937; border: 1px solid #4b5563; border-radius: 999px; padding: .2rem .55rem; margin-bottom: .45rem; }
+    .provider-label { font-size: .78rem; color: #cbd5e1; margin-bottom: .45rem; }
     .copy-inline { border: 1px solid #4b5563; background: #111827; color: #e5e7eb; border-radius: .5rem; font-size: .75rem; font-weight: 600; padding: .35rem .6rem; cursor: pointer; }
     .copy-inline.copied { background: #065f46; border-color: #10b981; color: #d1fae5; }
     .modal-backdrop { position: fixed; inset: 0; background: rgba(2,6,23,.75); display: none; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
@@ -36,7 +43,7 @@
       <h1 class="text-2xl font-bold text-white mb-6"><i class="fas fa-terminal text-purple-500 mr-2"></i>Trilha: Comandos Prisma ORM</h1>
       <div class="flex items-center justify-between relative">
         <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-800 -z-10"></div>
-        <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2" data-step="1"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div><span class="text-xs hidden sm:block">Fundacao</span></div>
+        <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2" data-step="1"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div><span class="text-xs hidden sm:block">Fundação</span></div>
         <div id="step-2" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="2"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">2</div><span class="text-xs hidden sm:block">Schema</span></div>
         <div id="step-3" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="3"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">3</div><span class="text-xs hidden sm:block">Sync</span></div>
         <div id="step-4" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="4"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">4</div><span class="text-xs hidden sm:block">Teste</span></div>
@@ -45,12 +52,12 @@
       </div>
       <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
         <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300" disabled><i class="fas fa-arrow-left mr-2"></i>Anterior</button>
-        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Proximo <i class="fas fa-arrow-right ml-2"></i></button>
+        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Próximo <i class="fas fa-arrow-right ml-2"></i></button>
       </div>
     </div>
 
     <div id="page-1" class="page-content page-active p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 1: A Fundacao e a Escolha do Banco</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 1: A Fundação e a Escolha do Banco</h2>
       <div class="info-tag">1. Prisma CLI (dev)</div>
       <div class="code" id="code-1">npm install prisma --save-dev</div>
       <p class="text-sm mb-4">Baixa o motor do Prisma (CLI) para desenvolvimento.</p>
@@ -58,9 +65,27 @@
       <div class="code" id="code-2">npm install @prisma/client</div>
       <p class="text-sm mb-4">Biblioteca usada pelo Next.js para conversar com o banco.</p>
       <div class="info-tag">3. Prisma init com provider</div>
-      <div class="code" id="code-3">npx prisma init --datasource-provider sqlite
-npx prisma init --datasource-provider mysql
-npx prisma init --datasource-provider postgresql</div>
+      <div class="warn-box">
+        <span class="warn-badge">🚨 Momento Critico</span>
+        <p class="text-sm">⚠️ Escolha o provider com atenção. Ele define como o projeto conversa com o banco e muda toda a estratégia de setup/migration.</p>
+      </div>
+      <div class="provider-list">
+        <div class="provider-item">
+          <span class="provider-badge">🟦 SQLite</span>
+          <p class="provider-label">Selecione esta linha se o projeto usar banco local em arquivo.</p>
+          <div class="code" id="code-3-sqlite">npx prisma init --datasource-provider sqlite</div>
+        </div>
+        <div class="provider-item">
+          <span class="provider-badge">🟨 MySQL</span>
+          <p class="provider-label">Selecione esta linha se o banco for MySQL.</p>
+          <div class="code" id="code-3-mysql">npx prisma init --datasource-provider mysql</div>
+        </div>
+        <div class="provider-item">
+          <span class="provider-badge">🟪 PostgreSQL</span>
+          <p class="provider-label">Selecione esta linha se o banco for PostgreSQL.</p>
+          <div class="code" id="code-3-postgres">npx prisma init --datasource-provider postgresql</div>
+        </div>
+      </div>
       <p class="text-sm">Escolha apenas um comando conforme o banco desejado.</p>
     </div>
 
@@ -76,7 +101,7 @@ npx prisma init --datasource-provider postgresql</div>
     </div>
 
     <div id="page-3" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 3: Sincronizacao (Criacao Fisica)</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 3: Sincronização (Criação Física)</h2>
       <div class="info-tag">6. Push sem historico</div>
       <div class="code" id="code-6">npx prisma db push</div>
       <p class="text-sm mb-4">Empurra o schema direto para o banco, sem migration files.</p>
@@ -99,7 +124,7 @@ npx prisma init --datasource-provider postgresql</div>
     </div>
 
     <div id="page-5" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 5: Manutencao e Troubleshooting</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 5: Manutenção e Troubleshooting</h2>
       <div class="info-tag">11. Reset local</div>
       <div class="code" id="code-11">npx prisma migrate reset</div>
       <p class="text-sm mb-4">Recria banco local com base nas migrations + seed.</p>
@@ -112,8 +137,8 @@ npx prisma init --datasource-provider postgresql</div>
     </div>
 
     <div id="page-6" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 6: Deploy (Producao)</h2>
-      <div class="info-tag">14. Aplicar migrations em producao</div>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 6: Deploy (Produção)</h2>
+      <div class="info-tag">14. Aplicar migrations em produção</div>
       <div class="code" id="code-14">npx prisma migrate deploy</div>
       <p class="text-sm">Comando seguro para aplicar migrations pendentes no banco real.</p>
       <div class="bg-green-950/30 p-4 rounded-lg border border-green-800 mt-6">
@@ -125,9 +150,9 @@ npx prisma init --datasource-provider postgresql</div>
 
   <div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
     <div class="finish-modal">
-      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluido</h3></div>
+      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluído</h3></div>
       <div class="modal-body">
-        <p class="text-sm">Voce finalizou o guia interativo de comandos Prisma.</p>
+        <p class="text-sm">Você finalizou o guia interativo de comandos Prisma.</p>
         <div class="modal-actions">
           <button id="finish-close" type="button" class="modal-btn secondary">Fechar</button>
           <button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button>
@@ -148,7 +173,7 @@ npx prisma init --datasource-provider postgresql</div>
 
     function copyTextWithFallback(text) {
       if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
-      return Promise.reject(new Error("Clipboard indisponivel"));
+      return Promise.reject(new Error("Clipboard indisponível"));
     }
 
     function addCopyButtons() {
@@ -200,7 +225,7 @@ npx prisma init --datasource-provider postgresql</div>
         btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
         btnNext.classList.replace("bg-purple-600", "bg-green-600");
       } else {
-        btnNext.innerHTML = 'Proximo <i class="fas fa-arrow-right ml-2"></i>';
+        btnNext.innerHTML = 'Próximo <i class="fas fa-arrow-right ml-2"></i>';
         btnNext.classList.replace("bg-green-600", "bg-purple-600");
       }
     }
@@ -220,3 +245,4 @@ npx prisma init --datasource-provider postgresql</div>
   </script>
 </body>
 </html>
+

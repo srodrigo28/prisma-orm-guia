@@ -36,7 +36,7 @@
       <h1 class="text-2xl font-bold text-white mb-6"><i class="fas fa-terminal text-purple-500 mr-2"></i>Trilha: Comandos Prisma ORM</h1>
       <div class="flex items-center justify-between relative">
         <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-800 -z-10"></div>
-        <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2" data-step="1"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div><span class="text-xs hidden sm:block">Fundacao</span></div>
+        <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2" data-step="1"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div><span class="text-xs hidden sm:block">Fundação</span></div>
         <div id="step-2" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="2"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">2</div><span class="text-xs hidden sm:block">Schema</span></div>
         <div id="step-3" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="3"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">3</div><span class="text-xs hidden sm:block">Sync</span></div>
         <div id="step-4" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2" data-step="4"><div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">4</div><span class="text-xs hidden sm:block">Teste</span></div>
@@ -45,12 +45,12 @@
       </div>
       <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
         <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300" disabled><i class="fas fa-arrow-left mr-2"></i>Anterior</button>
-        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Proximo <i class="fas fa-arrow-right ml-2"></i></button>
+        <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white">Próximo <i class="fas fa-arrow-right ml-2"></i></button>
       </div>
     </div>
 
     <div id="page-1" class="page-content page-active p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 1: A Fundacao e a Escolha do Banco</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 1: A Fundação e a Escolha do Banco</h2>
       <div class="info-tag">1. Prisma CLI (dev)</div>
       <div class="code" id="code-1">npm install prisma --save-dev</div>
       <p class="text-sm mb-4">Baixa o motor do Prisma (CLI) para desenvolvimento.</p>
@@ -76,7 +76,7 @@ npx prisma init --datasource-provider postgresql</div>
     </div>
 
     <div id="page-3" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 3: Sincronizacao (Criacao Fisica)</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 3: Sincronização (Criação Física)</h2>
       <div class="info-tag">6. Push sem historico</div>
       <div class="code" id="code-6">npx prisma db push</div>
       <p class="text-sm mb-4">Empurra o schema direto para o banco, sem migration files.</p>
@@ -99,7 +99,7 @@ npx prisma init --datasource-provider postgresql</div>
     </div>
 
     <div id="page-5" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 5: Manutencao e Troubleshooting</h2>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 5: Manutenção e Troubleshooting</h2>
       <div class="info-tag">11. Reset local</div>
       <div class="code" id="code-11">npx prisma migrate reset</div>
       <p class="text-sm mb-4">Recria banco local com base nas migrations + seed.</p>
@@ -112,8 +112,8 @@ npx prisma init --datasource-provider postgresql</div>
     </div>
 
     <div id="page-6" class="page-content p-6 sm:p-10">
-      <h2 class="text-xl font-semibold text-white mb-4">Fase 6: Deploy (Producao)</h2>
-      <div class="info-tag">14. Aplicar migrations em producao</div>
+      <h2 class="text-xl font-semibold text-white mb-4">Fase 6: Deploy (Produção)</h2>
+      <div class="info-tag">14. Aplicar migrations em produção</div>
       <div class="code" id="code-14">npx prisma migrate deploy</div>
       <p class="text-sm">Comando seguro para aplicar migrations pendentes no banco real.</p>
       <div class="bg-green-950/30 p-4 rounded-lg border border-green-800 mt-6">
@@ -125,9 +125,9 @@ npx prisma init --datasource-provider postgresql</div>
 
   <div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
     <div class="finish-modal">
-      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluido</h3></div>
+      <div class="modal-head"><h3 id="finish-title" class="text-lg font-semibold text-white"><i class="fas fa-award text-emerald-400 mr-2"></i>Treinamento concluído</h3></div>
       <div class="modal-body">
-        <p class="text-sm">Voce finalizou o guia interativo de comandos Prisma.</p>
+        <p class="text-sm">Você finalizou o guia interativo de comandos Prisma.</p>
         <div class="modal-actions">
           <button id="finish-close" type="button" class="modal-btn secondary">Fechar</button>
           <button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button>
@@ -148,7 +148,7 @@ npx prisma init --datasource-provider postgresql</div>
 
     function copyTextWithFallback(text) {
       if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
-      return Promise.reject(new Error("Clipboard indisponivel"));
+      return Promise.reject(new Error("Clipboard indisponível"));
     }
 
     function addCopyButtons() {
@@ -200,7 +200,7 @@ npx prisma init --datasource-provider postgresql</div>
         btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
         btnNext.classList.replace("bg-purple-600", "bg-green-600");
       } else {
-        btnNext.innerHTML = 'Proximo <i class="fas fa-arrow-right ml-2"></i>';
+        btnNext.innerHTML = 'Próximo <i class="fas fa-arrow-right ml-2"></i>';
         btnNext.classList.replace("bg-green-600", "bg-purple-600");
       }
     }
@@ -220,3 +220,5 @@ npx prisma init --datasource-provider postgresql</div>
   </script>
 </body>
 </html>
+
+

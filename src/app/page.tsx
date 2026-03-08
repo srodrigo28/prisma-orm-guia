@@ -202,7 +202,7 @@ export default function ProdutosPage() {
   return (
     <main className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex h-40 flex-col items-center gap-5 rounded-xl bg-violet-500 p-5">
+        <div className="mb-8 flex h-40 flex-col items-center gap-5 rounded-xl bg-slate-200 p-5">
           <h1 className="text-3xl font-bold text-white">Estoque de Produtos</h1>
 
           <div className="flex w-full gap-2 pb-5">
@@ -211,7 +211,7 @@ export default function ProdutosPage() {
               <input
                 type="text"
                 placeholder="Buscar produto..."
-                className="w-full rounded-lg border-2 border-blue-400 py-3 pl-5 pr-4 text-xl tracking-wider text-slate-950 outline-blue-400"
+                className="w-full rounded-lg border-2 border-blue-400 py-3 pl-10 pr-4 text-xl tracking-wider text-slate-950 outline-blue-400"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />
@@ -309,7 +309,7 @@ export default function ProdutosPage() {
                 <input
                   required
                   type="text"
-                  className="w-full rounded-lg border p-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg text-slate-900 border p-2 outline-none focus:ring-2 focus:ring-blue-500"
                   value={formData.nome}
                   onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 />
