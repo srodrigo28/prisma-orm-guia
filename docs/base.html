@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treinamento Interativo: Expo + TypeScript + NativeWind</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background-color: #0f1214; color: #a3aab1; font-family: 'Inter', sans-serif; }
+        .card { background-color: #171d21; border-radius: 0.75rem; border: 1px solid #1f2937; }
+        .step-active { color: #a855f7; border-color: #a855f7; }
+        .step-inactive { color: #4b5563; border-color: #374151; }
+        .step-clickable { cursor: pointer; }
+        .step-clickable:focus-visible {
+            outline: 2px solid #a855f7;
+            outline-offset: 4px;
+            border-radius: 0.5rem;
+        }
+        .page-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .page-active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .kbd { background: #374151; color: #fff; padding: 0.2rem 0.5rem; border-radius: 0.375rem; font-family: monospace; font-size: 0.875rem; border-bottom: 2px solid #1f2937; }
+        .code { background: #0f172a; color: #e2e8f0; border: 1px solid #374151; border-radius: 0.5rem; padding: 0.875rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.85rem; line-height: 1.45; white-space: pre; tab-size: 2; overflow-x: auto; }
+        .code-wrap { position: relative; }
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            border: 1px solid #4b5563;
+            background: #111827;
+            color: #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .copy-btn:hover { background: #1f2937; border-color: #6b7280; }
+        .copy-btn.copied { background: #065f46; border-color: #10b981; color: #d1fae5; }
+        .file-block {
+            border: 1px solid #374151;
+            border-radius: 0.75rem;
+            background: rgba(15, 23, 42, 0.42);
+            overflow: hidden;
+        }
+        .file-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.7rem 0.8rem;
+            background: rgba(17, 24, 39, 0.88);
+            border-bottom: 1px solid #374151;
+        }
+        .file-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            color: #e5e7eb;
+            background: transparent;
+            border: none;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .file-toggle i {
+            transition: transform 0.2s ease;
+            color: #a78bfa;
+        }
+        .file-toggle[aria-expanded="true"] i {
+            transform: rotate(90deg);
+        }
+        .copy-inline {
+            border: 1px solid #4b5563;
+            background: #111827;
+            color: #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .copy-inline:hover { background: #1f2937; border-color: #6b7280; }
+        .copy-inline.copied { background: #065f46; border-color: #10b981; color: #d1fae5; }
+        .info-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 0.25rem 0.55rem;
+            margin-bottom: 0.55rem;
+        }
+        .file-content {
+            display: none;
+            padding: 0.8rem;
+            animation: fadeIn 0.25s ease;
+        }
+        .file-content.open { display: block; }
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 1rem;
+        }
+        .modal-backdrop.show { display: flex; }
+        .finish-modal {
+            width: 100%;
+            max-width: 32rem;
+            border-radius: 1rem;
+            border: 1px solid #334155;
+            background: radial-gradient(circle at top right, #1e293b 0%, #111827 55%, #0b1220 100%);
+            color: #cbd5e1;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transform: translateY(20px) scale(0.98);
+            opacity: 0;
+            animation: modalIn 0.35s ease forwards;
+        }
+        .modal-head {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #334155;
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.15), rgba(16, 185, 129, 0.12));
+        }
+        .modal-body { padding: 1.1rem 1.25rem 1.3rem; }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+        .modal-btn {
+            border-radius: 0.6rem;
+            padding: 0.5rem 0.85rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+        .modal-btn.secondary {
+            background: #1f2937;
+            color: #d1d5db;
+            border-color: #374151;
+        }
+        .modal-btn.secondary:hover { background: #111827; }
+        .modal-btn.primary {
+            background: #10b981;
+            color: #052e26;
+            border-color: #34d399;
+        }
+        .modal-btn.primary:hover { background: #34d399; }
+        .sparkline {
+            height: 3px;
+            width: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #a855f7, #10b981, #3b82f6);
+            background-size: 200% 100%;
+            animation: pulseLine 1.8s linear infinite;
+        }
+        @keyframes modalIn {
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes pulseLine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+
+<div class="w-full max-w-4xl card shadow-2xl overflow-hidden">
+
+    <div class="p-6 border-b border-gray-800 bg-[#11161a]">
+        <h1 class="text-2xl font-bold text-white mb-6"><i class="fas fa-wand-magic-sparkles text-purple-500 mr-2"></i> Trilha: Expo + TypeScript + NativeWind</h1>
+
+        <div class="flex items-center justify-between relative">
+            <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-800 -z-10"></div>
+
+            <div id="step-1" class="flex flex-col items-center step-active step-clickable bg-[#11161a] px-2 transition-colors" data-step="1" role="button" tabindex="0" aria-label="Ir para o passo 1">
+                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-active">1</div>
+                <span class="text-xs font-medium uppercase tracking-wider hidden sm:block">Requisitos</span>
+            </div>
+
+            <div id="step-2" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2 transition-colors" data-step="2" role="button" tabindex="0" aria-label="Ir para o passo 2">
+                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">2</div>
+                <span class="text-xs font-medium uppercase tracking-wider hidden sm:block">Criar App</span>
+            </div>
+
+            <div id="step-3" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2 transition-colors" data-step="3" role="button" tabindex="0" aria-label="Ir para o passo 3">
+                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">3</div>
+                <span class="text-xs font-medium uppercase tracking-wider hidden sm:block">Instalacao</span>
+            </div>
+
+            <div id="step-4" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2 transition-colors" data-step="4" role="button" tabindex="0" aria-label="Ir para o passo 4">
+                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">4</div>
+                <span class="text-xs font-medium uppercase tracking-wider hidden sm:block">Configuracao</span>
+            </div>
+
+            <div id="step-5" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2 transition-colors" data-step="5" role="button" tabindex="0" aria-label="Ir para o passo 5">
+                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">5</div>
+                <span class="text-xs font-medium uppercase tracking-wider hidden sm:block">Teste</span>
+            </div>
+
+            <div id="step-6" class="flex flex-col items-center step-inactive step-clickable bg-[#11161a] px-2 transition-colors" data-step="6" role="button" tabindex="0" aria-label="Ir para o passo 6">
+                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold bg-[#11161a] mb-2 step-inactive">6</div>
+                <span class="text-xs font-medium uppercase tracking-wider hidden sm:block">Validacao</span>
+            </div>
+        </div>
+
+        <div class="mt-6 pt-5 border-t border-gray-800 flex justify-between items-center">
+            <button id="btn-prev" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-300 hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <i class="fas fa-arrow-left mr-2"></i> Anterior
+            </button>
+
+            <button id="btn-next" class="px-5 py-2 rounded-lg text-sm font-medium bg-purple-600 text-white hover:bg-purple-500 transition">
+                Próximo <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="page-1" class="page-content page-active p-6 sm:p-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Módulo 1: Referências e Requisitos</h2>
+        <p class="mb-6">Antes de iniciar, valide o ambiente local e confirme a versão do Node.js.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-purple-400 font-bold mb-2"><i class="fas fa-link mr-2"></i> Referências</h3>
+                <ul class="list-disc list-inside text-sm space-y-1">
+                    <li>https://www.nativewind.dev/</li>
+                    <li>https://docs.expo.dev/</li>
+                    <li>https://nodejs.org/en/download</li>
+                </ul>
+            </div>
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-purple-400 font-bold mb-2"><i class="fas fa-check-circle mr-2"></i> Verificação de Node</h3>
+                <div class="info-tag">🔎 Executar comando: verificar versao do Node</div>
+                <div class="code mb-3">node -v</div>
+                <p class="text-sm">Se o comando falhar, instale o Node pelo link oficial e reinicie o terminal.</p>
+                <p class="text-sm mt-2">Regra: continuar com Node <strong class="text-white">&gt;= 20</strong> (LTS recomendado).</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-2" class="page-content p-6 sm:p-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Módulo 2: Criar Projeto Expo com TypeScript</h2>
+        <p class="mb-6">Com o Node validado, crie seu app base em TypeScript.</p>
+
+        <div class="bg-gray-800/30 p-5 rounded-lg border border-gray-700">
+            <h3 class="text-blue-400 font-bold mb-3"><i class="fas fa-terminal mr-2"></i> Comandos</h3>
+            <div class="info-tag">🆕 Executar comando: criar projeto Expo TypeScript</div>
+            <div class="code">npx create-expo-app@latest app-nativewind --template blank-typescript </div>
+            <div class="info-tag mt-3">📂 Executar comando: entrar na pasta do projeto</div>
+            <div class="code">cd app-nativewind</div>
+        </div>
+    </div>
+
+    <div id="page-3" class="page-content p-6 sm:p-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Módulo 3: Instalar NativeWind e Tailwind</h2>
+        <p class="mb-6">Agora instale as dependências obrigatórias (incluindo Babel preset) e gere o arquivo base do Tailwind.</p>
+
+        <div class="space-y-4">
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-blue-400 font-bold mb-2">Instalação</h3>
+                <div class="info-tag">🧩 Executar comando: instalar dependencias</div>
+                <div class="code">npm install nativewind tailwindcss babel-preset-expo</div>
+                <div class="info-tag mt-3">🌐 Executar comando: instalar pacotes Expo/Web</div>
+                <div class="code mt-3">npx expo install react-native-reanimated react-native-safe-area-context react-native-worklets react-dom react-native-web</div>
+            </div>
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-blue-400 font-bold mb-2">Init Tailwind</h3>
+                <div class="info-tag">📄 Executar comando: gerar arquivo base</div>
+                <div class="code">npx tailwindcss init</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-4" class="page-content p-6 sm:p-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Módulo 4: Configuração de Arquivos</h2>
+        <p class="mb-6">Configure Tailwind, CSS global, Babel, tipagem e Metro para ativar o NativeWind.</p>
+
+        <details class="bg-blue-950/30 p-4 rounded-lg border border-blue-700 mb-4">
+            <summary class="text-blue-300 font-bold cursor-pointer select-none">
+                <i class="fas fa-circle-info mr-2"></i> Guia rapido antes de copiar os codigos (clique para expandir/recolher)
+            </summary>
+            <div class="text-sm space-y-3 mt-3">
+                <p class="text-blue-100">Siga esta sequencia para nao se perder:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>1️⃣ <strong class="text-white">Criar arquivos novos</strong>: <code>global.css</code>, <code>metro.config.js</code>, <code>babel.config.js</code>, <code>nativewind-env.d.ts</code> (se ainda nao existirem).</li>
+                    <li>2️⃣ <strong class="text-white">Substituir conteudo</strong>: <code>tailwind.config.js</code> e <code>babel.config.js</code> (se ja existirem).</li>
+                    <li>3️⃣ <strong class="text-white">Nao alterar agora</strong>: <code>index.ts</code>, <code>app.json</code>, <code>tsconfig.json</code>.</li>
+                    <li>4️⃣ <strong class="text-white">Salvar e validar</strong>: rode <code>npx expo start -c</code> para aplicar tudo com cache limpo.</li>
+                </ul>
+            </div>
+        </details>
+
+        <div class="grid grid-cols-1 gap-4">
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <div class="file-block">
+                    <div class="file-head">
+                        <button class="file-toggle" type="button" data-target="panel-tailwind" aria-expanded="false">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>tailwind.config.js</span>
+                        </button>
+                        <button class="copy-inline" type="button" data-copy-target="code-tailwind">
+                            <i class="fas fa-copy mr-1"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="px-3 pt-3">
+                        <p class="info-tag">✍️ Acao: substituir conteudo de tailwind.config.js</p>
+                    </div>
+                    <div id="panel-tailwind" class="file-content">
+                        <pre id="code-tailwind" class="code code-manual">/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
+  theme: { extend: {} },
+  plugins: [],
+};</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <div class="file-block">
+                    <div class="file-head">
+                        <button class="file-toggle" type="button" data-target="panel-types" aria-expanded="false">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>nativewind-env.d.ts</span>
+                        </button>
+                        <button class="copy-inline" type="button" data-copy-target="code-types">
+                            <i class="fas fa-copy mr-1"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="px-3 pt-3">
+                        <p class="info-tag">🆕 Acao: criar arquivo nativewind-env.d.ts</p>
+                    </div>
+                    <div id="panel-types" class="file-content">
+                        <pre id="code-types" class="code code-manual">/// &lt;reference types="nativewind/types" /&gt;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <div class="file-block">
+                    <div class="file-head">
+                        <button class="file-toggle" type="button" data-target="panel-global" aria-expanded="false">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>global.css</span>
+                        </button>
+                        <button class="copy-inline" type="button" data-copy-target="code-global">
+                            <i class="fas fa-copy mr-1"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="px-3 pt-3">
+                        <p class="info-tag">🆕 Acao: criar arquivo global.css</p>
+                    </div>
+                    <div id="panel-global" class="file-content">
+                        <pre id="code-global" class="code code-manual">@tailwind base;
+@tailwind components;
+@tailwind utilities;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <div class="file-block">
+                    <div class="file-head">
+                        <button class="file-toggle" type="button" data-target="panel-babel" aria-expanded="false">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>babel.config.js</span>
+                        </button>
+                        <button class="copy-inline" type="button" data-copy-target="code-babel">
+                            <i class="fas fa-copy mr-1"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="px-3 pt-3">
+                        <p class="info-tag">✍️ Acao: substituir (ou criar) babel.config.js</p>
+                    </div>
+                    <div id="panel-babel" class="file-content">
+                        <pre id="code-babel" class="code code-manual">module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: [
+      ["babel-preset-expo", { jsxImportSource: "nativewind" }],
+      "nativewind/babel",
+    ],
+  };
+};</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <div class="file-block">
+                    <div class="file-head">
+                        <button class="file-toggle" type="button" data-target="panel-metro" aria-expanded="false">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>metro.config.js</span>
+                        </button>
+                        <button class="copy-inline" type="button" data-copy-target="code-metro">
+                            <i class="fas fa-copy mr-1"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="px-3 pt-3">
+                        <p class="info-tag">🆕 Acao: criar arquivo metro.config.js</p>
+                    </div>
+                    <div id="panel-metro" class="file-content">
+                        <pre id="code-metro" class="code code-manual">const { getDefaultConfig } = require("expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
+const config = getDefaultConfig(__dirname);
+module.exports = withNativeWind(config, { input: "./global.css" });</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-5" class="page-content p-6 sm:p-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Módulo 5: Teste no App.tsx</h2>
+        <p class="mb-6">Importe o CSS global e aplique classes utilitárias para validar o NativeWind.</p>
+
+        <details class="bg-blue-950/30 p-4 rounded-lg border border-blue-700 mb-4">
+            <summary class="text-blue-300 font-bold cursor-pointer select-none">
+                <i class="fas fa-lightbulb mr-2"></i> Sequencia para teste do App.tsx
+            </summary>
+            <p class="text-sm mt-3">
+                1️⃣ Substitua todo o <code>App.tsx</code> pelo exemplo abaixo.<br>
+                2️⃣ Rode o app e confirme estilos com <code>className</code>.<br>
+                3️⃣ Se funcionou, volte para sua tela real e mantenha apenas a estrutura de configuracao.
+            </p>
+        </details>
+
+        <div class="bg-gray-800/30 p-5 rounded-lg border border-gray-700">
+            <div class="file-block">
+                <div class="file-head">
+                    <button class="file-toggle" type="button" data-target="panel-app" aria-expanded="false">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>App.tsx (exemplo de validação)</span>
+                    </button>
+                    <button class="copy-inline" type="button" data-copy-target="code-app">
+                        <i class="fas fa-copy mr-1"></i> Copiar
+                    </button>
+                </div>
+                <div class="px-3 pt-3">
+                    <p class="info-tag">✍️ Acao: substituir conteudo inteiro de App.tsx (teste)</p>
+                </div>
+                <div id="panel-app" class="file-content">
+                    <pre id="code-app" class="code code-manual">import "./global.css";
+import { StatusBar } from "expo-status-bar";
+import { Text, View } from "react-native";
+
+export default function App() {
+  return (
+    &lt;View className="flex-1 items-center justify-center bg-slate-950 px-6"&gt;
+      &lt;View className="w-full max-w-sm rounded-2xl bg-slate-800 p-6"&gt;
+        &lt;Text className="text-2xl font-bold text-emerald-400"&gt;
+          NativeWind funcionando
+        &lt;/Text&gt;
+        &lt;Text className="mt-2 text-base text-slate-200"&gt;
+          Se voce esta vendo cores e espacamentos com className, esta correto.
+        &lt;/Text&gt;
+      &lt;/View&gt;
+      &lt;StatusBar style="light" /&gt;
+      &lt;/View&gt;
+  );
+}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-6" class="page-content p-6 sm:p-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Módulo 6: Execução e Troubleshooting</h2>
+        <p class="mb-6">Rode o projeto, teste no dispositivo e limpe cache se necessário.</p>
+
+        <details class="bg-amber-950/30 p-4 rounded-lg border border-amber-700 mb-4">
+            <summary class="text-amber-300 font-bold cursor-pointer select-none">
+                <i class="fas fa-triangle-exclamation mr-2"></i> Erros comuns e correção
+            </summary>
+            <div class="text-sm space-y-3 mt-3">
+                <p><strong class="text-white">Erro:</strong> <code>Cannot find module 'babel-preset-expo'</code></p>
+                <div class="info-tag">🛠️ Executar comando: corrigir preset Babel ausente</div>
+                <div class="code">npm install -D babel-preset-expo
+npx expo start -c</div>
+                <p><strong class="text-white">Erro:</strong> <code>.plugins is not a valid Plugin property</code></p>
+                <p>Confirme o <code>babel.config.js</code> exatamente como no Módulo 4 (com <code>nativewind/babel</code> em <code>presets</code>).</p>
+            </div>
+        </details>
+
+        <div class="space-y-4 mb-6">
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-yellow-400 font-bold mb-2">Teste limpo (do zero)</h3>
+                <div class="info-tag">🧹 Executar comando: limpar e reinstalar</div>
+                <div class="code">Remove-Item -Recurse -Force node_modules, package-lock.json, .expo, dist
+npm install
+npx expo start -c</div>
+            </div>
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-yellow-400 font-bold mb-2">Start do projeto</h3>
+                <div class="info-tag">🚀 Executar comando: iniciar Expo</div>
+                <div class="code">npx expo start</div>
+                <p class="text-sm mt-3">Atalhos: <span class="kbd">a</span> Android, <span class="kbd">i</span> iOS (macOS), ou QR Code no Expo Go.</p>
+            </div>
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-yellow-400 font-bold mb-2">Limpar cache</h3>
+                <div class="info-tag">♻️ Executar comando: resetar cache</div>
+                <div class="code">npx expo start -c</div>
+            </div>
+            <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-yellow-400 font-bold mb-2">Validar dependências do SDK</h3>
+                <div class="info-tag">🩺 Executar comando: diagnostico do projeto</div>
+                <div class="code">npx expo-doctor</div>
+                <p class="text-sm mt-3">Se houver erro de peer dependency, rode <code>npx expo install react-native-worklets</code>.</p>
+            </div>
+        </div>
+
+        <div class="bg-green-950/30 p-4 rounded-lg border border-green-800">
+            <h3 class="text-green-400 font-bold mb-2"><i class="fas fa-flag-checkered mr-2"></i> Resultado esperado</h3>
+            <p class="text-sm">Tela escura com card e textos estilizados por <code>className</code>, confirmando o NativeWind ativo.</p>
+        </div>
+    </div>
+
+</div>
+
+<div id="finish-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="finish-title">
+    <div class="finish-modal">
+        <div class="modal-head">
+            <h3 id="finish-title" class="text-lg font-semibold text-white">
+                <i class="fas fa-award text-emerald-400 mr-2"></i> Treinamento concluído
+            </h3>
+        </div>
+        <div class="sparkline"></div>
+        <div class="modal-body">
+            <p class="text-sm">
+                Parabéns, você finalizou todos os módulos do guia Expo + TypeScript + NativeWind.
+            </p>
+            <p class="text-sm mt-2">
+                Você pode revisar os passos usando o botão <strong class="text-white">Anterior</strong> ou reiniciar a trilha para praticar novamente.
+            </p>
+            <div class="modal-actions">
+                <button id="finish-close" type="button" class="modal-btn secondary">Fechar</button>
+                <button id="finish-restart" type="button" class="modal-btn primary">Reiniciar trilha</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    const totalPages = 6;
+
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const finishModalBackdrop = document.getElementById('finish-modal-backdrop');
+    const finishCloseBtn = document.getElementById('finish-close');
+    const finishRestartBtn = document.getElementById('finish-restart');
+
+    function openFinishModal() {
+        finishModalBackdrop.classList.add('show');
+    }
+
+    function closeFinishModal() {
+        finishModalBackdrop.classList.remove('show');
+    }
+
+    function copyTextWithFallback(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+
+        return new Promise((resolve, reject) => {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const ok = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (ok) resolve();
+                else reject(new Error('Falha ao copiar.'));
+            } catch (err) {
+                document.body.removeChild(textArea);
+                reject(err);
+            }
+        });
+    }
+
+    function enableCopyButtons() {
+        const codeBlocks = document.querySelectorAll('.code:not(.code-manual)');
+
+        codeBlocks.forEach((codeBlock) => {
+            if (codeBlock.parentElement && codeBlock.parentElement.classList.contains('code-wrap')) return;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-wrap';
+            codeBlock.parentNode.insertBefore(wrapper, codeBlock);
+            wrapper.appendChild(codeBlock);
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'copy-btn';
+            button.innerHTML = '<i class="fas fa-copy mr-1"></i> Copiar';
+            wrapper.appendChild(button);
+
+            bindCopyButton(button, codeBlock);
+        });
+    }
+
+    function bindCopyButton(button, targetElement) {
+        button.addEventListener('click', async () => {
+            const content = targetElement.textContent;
+            try {
+                await copyTextWithFallback(content);
+                button.classList.add('copied');
+                button.innerHTML = '<i class="fas fa-check mr-1"></i> Copiado!';
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    button.innerHTML = '<i class="fas fa-copy mr-1"></i> Copiar';
+                }, 1400);
+            } catch (error) {
+                button.innerHTML = '<i class="fas fa-xmark mr-1"></i> Erro';
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-copy mr-1"></i> Copiar';
+                }, 1400);
+            }
+        });
+    }
+
+    function enableManualCopyButtons() {
+        const manualButtons = document.querySelectorAll('.copy-inline[data-copy-target]');
+        manualButtons.forEach((button) => {
+            const targetId = button.getAttribute('data-copy-target');
+            const targetElement = document.getElementById(targetId);
+            if (!targetElement) return;
+            bindCopyButton(button, targetElement);
+        });
+    }
+
+    function enableFileToggles() {
+        const toggles = document.querySelectorAll('.file-toggle[data-target]');
+        toggles.forEach((toggle) => {
+            const targetId = toggle.getAttribute('data-target');
+            const panel = document.getElementById(targetId);
+            if (!panel) return;
+
+            toggle.addEventListener('click', () => {
+                const isOpen = panel.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+        });
+    }
+
+    function goToPage(targetPage) {
+        if (targetPage < 1 || targetPage > totalPages) return;
+        currentPage = targetPage;
+        updatePagination();
+    }
+
+    function enableStepNavigation() {
+        const stepItems = document.querySelectorAll('[data-step]');
+
+        stepItems.forEach((stepItem) => {
+            const targetPage = Number(stepItem.getAttribute('data-step'));
+
+            stepItem.addEventListener('click', () => {
+                goToPage(targetPage);
+            });
+
+            stepItem.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    goToPage(targetPage);
+                }
+            });
+        });
+    }
+
+    function updatePagination() {
+        for (let i = 1; i <= totalPages; i++) {
+            document.getElementById(`page-${i}`).classList.remove('page-active');
+            const step = document.getElementById(`step-${i}`);
+            const stepCircle = step.querySelector('div');
+            step.setAttribute('aria-current', i === currentPage ? 'step' : 'false');
+
+            if (i <= currentPage) {
+                step.classList.add('step-active');
+                step.classList.remove('step-inactive');
+                stepCircle.classList.add('step-active');
+                stepCircle.classList.remove('step-inactive');
+            } else {
+                step.classList.remove('step-active');
+                step.classList.add('step-inactive');
+                stepCircle.classList.remove('step-active');
+                stepCircle.classList.add('step-inactive');
+            }
+        }
+
+        document.getElementById(`page-${currentPage}`).classList.add('page-active');
+        btnPrev.disabled = currentPage === 1;
+
+        if (currentPage === totalPages) {
+            btnNext.innerHTML = 'Finalizar <i class="fas fa-check ml-2"></i>';
+            btnNext.classList.replace('bg-purple-600', 'bg-green-600');
+            btnNext.classList.replace('hover:bg-purple-500', 'hover:bg-green-500');
+        } else {
+            btnNext.innerHTML = 'Próximo <i class="fas fa-arrow-right ml-2"></i>';
+            btnNext.classList.replace('bg-green-600', 'bg-purple-600');
+            btnNext.classList.replace('hover:bg-green-500', 'hover:bg-purple-500');
+        }
+    }
+
+    btnNext.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            goToPage(currentPage + 1);
+        } else {
+            openFinishModal();
+        }
+    });
+
+    btnPrev.addEventListener('click', () => {
+        if (currentPage > 1) {
+            goToPage(currentPage - 1);
+        }
+    });
+
+    finishCloseBtn.addEventListener('click', closeFinishModal);
+
+    finishRestartBtn.addEventListener('click', () => {
+        closeFinishModal();
+        currentPage = 1;
+        updatePagination();
+    });
+
+    finishModalBackdrop.addEventListener('click', (event) => {
+        if (event.target === finishModalBackdrop) {
+            closeFinishModal();
+        }
+    });
+
+    enableCopyButtons();
+    enableManualCopyButtons();
+    enableFileToggles();
+    enableStepNavigation();
+</script>
+
+</body>
+</html>
